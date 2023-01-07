@@ -1,8 +1,9 @@
-from api.models.Phase import Phase
 from rest_framework import serializers
 
+from api.models.Phase import Phase
 
-class PhaseSerializer(serializers.HyperlinkedModelSerializer):
+
+class PhaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phase
-        fields = ("weights", "diet", "total_days")
+        fields = ("id", "weights", "diet", "total_days")

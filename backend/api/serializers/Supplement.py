@@ -1,14 +1,22 @@
-from api.models.Supplement import Supplement, SupplementSet
 from rest_framework import serializers
 
+from api.models.Supplement import Supplement, SupplementSet
 
-class SupplementSerializer(serializers.HyperlinkedModelSerializer):
+
+class SupplementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplement
-        fields = ("name", "description", "price_history", "kg_presentation", "units")
+        fields = (
+            "id",
+            "name",
+            "description",
+            "price_history",
+            "kg_presentation",
+            "units",
+        )
 
 
-class SupplementSetSerializer(serializers.HyperlinkedModelSerializer):
+class SupplementSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupplementSet
-        fields = ("supplement", "quantity")
+        fields = ("id", "supplement", "quantity")

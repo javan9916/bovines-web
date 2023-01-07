@@ -1,5 +1,6 @@
-from api.models.Category import Category
 from django.db import models
+
+from api.models.Category import Category
 
 
 class Cost(models.Model):

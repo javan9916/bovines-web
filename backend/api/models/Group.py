@@ -1,18 +1,19 @@
+from django.db import models
+
 from api.models.Animal import Animal
 from api.models.Phase import Phase
 from api.models.Sector import Sector
 from api.models.Weight import Weight
-from django.db import models
 
 
 class Group(models.Model):
     name = models.CharField(max_length=100)
     phases = models.ManyToManyField(Phase)
-    sector = models.ForeignKey(Sector, on_delete=models.CASCADE)
-    total_days = models.IntegerField()
+    sector = models.ForeignKey(Sector, on_delete=models.CASCADE, null=True)
+    total_days = models.IntegerField(null=True)
     animals = models.ManyToManyField(Animal)
-    purchase_date = models.DateField()
-    initial_weight = models.ForeignKey(Weight, on_delete=models.CASCADE)
+    purchase_date = models.DateField(null=True)
+    initial_weight = models.ForeignKey(Weight, on_delete=models.CASCADE, null=True)
 
     def __str__(self) -> str:
         return (

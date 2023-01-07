@@ -1,8 +1,9 @@
-from api.models.Diet import Diet
 from rest_framework import serializers
 
+from api.models.Diet import Diet
 
-class DietSerializer(serializers.HyperlinkedModelSerializer):
+
+class DietSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diet
-        fields = ("name", "total_cost", "supplements")
+        fields = ("id", "name", "total_cost", "supplements")

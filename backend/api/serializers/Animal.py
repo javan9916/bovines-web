@@ -1,8 +1,9 @@
-from api.models.Animal import Animal
 from rest_framework import serializers
 
+from api.models.Animal import Animal
 
-class AnimalSerializer(serializers.HyperlinkedModelSerializer):
+
+class AnimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Animal
-        fields = ("sex", "cost")
+        fields = ("id", "badge_number", "sex", "cost")

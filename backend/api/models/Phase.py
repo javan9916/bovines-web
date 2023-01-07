@@ -1,6 +1,7 @@
+from django.db import models
+
 from api.models.Diet import Diet
 from api.models.Weight import Weight
-from django.db import models
 
 
 class Phase(models.Model):

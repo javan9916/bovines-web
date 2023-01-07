@@ -1,3 +1,5 @@
+from django.contrib import admin
+
 from api.models import (
     Animal,
     Category,
@@ -10,7 +12,6 @@ from api.models import (
     Supplement,
     Weight,
 )
-from django.contrib import admin
 
 # Register your models here.
 admin.site.register(Animal)

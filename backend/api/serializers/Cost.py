@@ -1,8 +1,9 @@
-from api.models.Cost import Cost
 from rest_framework import serializers
 
+from api.models.Cost import Cost
 
-class CostSerializer(serializers.HyperlinkedModelSerializer):
+
+class CostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cost
-        fields = ("name", "type", "category")
+        fields = ("id", "name", "type", "category")

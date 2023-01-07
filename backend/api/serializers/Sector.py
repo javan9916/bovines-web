@@ -1,8 +1,9 @@
-from api.models.Sector import Sector
 from rest_framework import serializers
 
+from api.models.Sector import Sector
 
-class SectorSerializer(serializers.HyperlinkedModelSerializer):
+
+class SectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sector
-        fields = ("name", "area")
+        fields = ("id", "name", "area")
