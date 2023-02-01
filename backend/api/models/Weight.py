@@ -9,7 +9,6 @@ class Weight(models.Model):
     date = models.DateField()
     gpt = models.IntegerField()
     gpd = models.FloatField()
-    current_days = models.IntegerField()
 
     def __str__(self) -> str:
         return (

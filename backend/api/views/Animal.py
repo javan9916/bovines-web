@@ -9,15 +9,16 @@ from api.serializers.Animal import AnimalSerializer
 @api_view(["GET", "POST"])
 def animals(request):
     if request.method == "GET":
-        animals = Animal.objects.all().order_by("sex")
+        animals = Animal.objects.all()
         serializer = AnimalSerializer(animals, many=True)
-        return Response(serializer.data)
+        return Response({"animals": serializer.data})
 
     elif request.method == "POST":
         serializer = AnimalSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"animal": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET", "PUT", "DELETE"])
@@ -35,7 +36,7 @@ def animal(request, id):
         serializer = AnimalSerializer(animal, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({"animal": serializer.data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == "DELETE":
