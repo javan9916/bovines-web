@@ -6,4 +6,4 @@ from api.models.Sector import Sector
 class SectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sector
-        fields = ("id", "name", "area")
+        fields = "__all__"

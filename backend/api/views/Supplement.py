@@ -1,43 +1,43 @@
-from rest_framework import status
-from rest_framework.decorators import api_view
+import json
+
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
+from rest_framework import status
+
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import LimitOffsetPagination
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models.Supplement import Supplement
+from api.models.PriceHistory import PriceHistory
+
 from api.serializers.Supplement import SupplementSerializer
 
 
-@api_view(["GET", "POST"])
-def supplements(request):
-    if request.method == "GET":
-        supplements = Supplement.objects.all()
-        serializer = SupplementSerializer(supplements, many=True)
-        return Response(serializer.data)
+class SupplementViewSet(ModelViewSet):
+    queryset = Supplement.objects.all()
+    serializer_class = SupplementSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    pagination_class = LimitOffsetPagination
 
-    elif request.method == "POST":
-        serializer = SupplementSerializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        body_unicode = request.body.decode("utf-8")
+        data = json.loads(body_unicode)
+        price = data["price"]
+
+        serializer = self.get_serializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-@api_view(["GET", "PUT", "DELETE"])
-def supplement(request, id):
-    try:
-        supplement = Supplement.objects.get(pk=id)
-    except Supplement.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = SupplementSerializer(supplement)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        serializer = SupplementSerializer(supplement, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            supplement = serializer.save()
+            self.create_price_history(supplement, price)
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == "DELETE":
-        supplement.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def create_price_history(self, supplement, price):
+        try:
+            price_history = PriceHistory.objects.create(
+                price=price, supplement=supplement
+            )
+            price_history.save()
+        except Exception as e:
+            print(e)

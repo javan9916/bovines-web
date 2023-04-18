@@ -1,20 +1,35 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 
-from api.views import Animal, Category, Cost, Group, Phase, Sector, Weight
+from api.views import (
+    Animal,
+    Category,
+    Cost,
+    Diet,
+    DietSupplement,
+    Group,
+    Phase,
+    PriceHistory,
+    Sector,
+    Supplement,
+    Weight,
+)
 
-urlpatterns = [
-    path("api/animals/", Animal.animals),
-    path("api/animals/<int:id>", Animal.animal),
-    path("api/groups/", Group.groups),
-    path("api/groups/<int:id>", Group.group),
-    path("api/sectors/", Sector.sectors),
-    path("api/sectors/<int:id>", Sector.sector),
-    path("api/phases/", Phase.phases),
-    path("api/phases/<int:id>", Phase.phase),
-    path("api/weights/", Weight.weights),
-    path("api/weights/<int:id>", Weight.weight),
-    path("api/costs/", Cost.costs),
-    path("api/costs/<int:id>", Cost.cost),
-    path("api/categories/", Category.categories),
-    path("api/categories/<int:id>", Category.category),
-]
+
+router = routers.DefaultRouter()
+router.register("animal", Animal.AnimalViewSet, "animal")
+router.register("category", Category.CategoryViewSet, "category")
+router.register("cost", Cost.CostViewSet, "cost")
+router.register("diet", Diet.DietViewSet, "diet")
+router.register(
+    "diet_supplement", DietSupplement.DietSupplementViewSet, "diet_supplement"
+)
+router.register("group", Group.GroupViewSet, "group")
+router.register("phase", Phase.PhaseViewSet, "phase")
+router.register("price_history", PriceHistory.PriceHistoryViewSet, "price_history")
+router.register("sector", Sector.SectorViewSet, "sector")
+router.register("supplement", Supplement.SupplementViewSet, "supplement")
+router.register("weight", Weight.WeightViewSet, "weight")
+
+
+urlpatterns = [path("api/", include(router.urls))]

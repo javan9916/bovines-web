@@ -1,43 +1,48 @@
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+import json
+
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models.Group import Group
+from api.models.Sector import Sector
 from api.serializers.Group import GroupSerializer
 
 
-@api_view(["GET", "POST"])
-def groups(request):
-    if request.method == "GET":
-        groups = Group.objects.all()
-        serializer = GroupSerializer(groups, many=True)
-        return Response(serializer.data)
+class GroupViewSet(ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["animals"]
+    ordering = ["id"]
 
-    elif request.method == "POST":
-        serializer = GroupSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+        body_unicode = request.body.decode("utf-8")
+        data = json.loads(body_unicode)
+        sector_pk = data["sector"]
 
+        sector = Sector.objects.get(pk=sector_pk)
+        sector.has_group = True
+        sector.save()
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        body_unicode = request.body.decode("utf-8")
+        data = json.loads(body_unicode)
+        sector_pk = data["sector"]
 
-@api_view(["GET", "PUT", "DELETE"])
-def group(request, id):
-    try:
-        group = Group.objects.get(pk=id)
-    except Group.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = GroupSerializer(group)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        serializer = GroupSerializer(group, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == "DELETE":
-        group.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if sector_pk != instance.sector.pk:
+            instance.sector.has_group = False
+            instance.sector.save()
+            sector = Sector.objects.get(pk=sector_pk)
+            sector.has_group = True
+            sector.save()
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.sector.has_group = False
+        instance.sector.save()
+        return super().destroy(request, *args, **kwargs)

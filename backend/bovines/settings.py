@@ -25,11 +25,14 @@ SECRET_KEY = "django-insecure-=n$fa12*2_dg0@l4$9$&*1at63s@gyqdx_+gn$nucmzk2a!f0h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+}
 
 
 # Application definition
@@ -38,12 +41,13 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "rest_framework",
     "corsheaders",
+    "django_filters",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles"
+    "django.contrib.staticfiles",
 ]
 
 MIDDLEWARE = [
@@ -129,3 +133,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]

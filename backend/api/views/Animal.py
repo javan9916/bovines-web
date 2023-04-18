@@ -1,44 +1,18 @@
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import LimitOffsetPagination
 
 from api.models.Animal import Animal
 from api.serializers.Animal import AnimalSerializer
+from api.filters.Animal import AnimalFilter
 
 
-@api_view(["GET", "POST"])
-def animals(request):
-    if request.method == "GET":
-        animals = Animal.objects.all()
-        serializer = AnimalSerializer(animals, many=True)
-        return Response({"animals": serializer.data})
-
-    elif request.method == "POST":
-        serializer = AnimalSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"animal": serializer.data}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "PUT", "DELETE"])
-def animal(request, id):
-    try:
-        animal = Animal.objects.get(pk=id)
-    except Animal.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = AnimalSerializer(animal)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        serializer = AnimalSerializer(animal, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"animal": serializer.data})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == "DELETE":
-        animal.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class AnimalViewSet(ModelViewSet):
+    queryset = Animal.objects.all()
+    serializer_class = AnimalSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = AnimalFilter
+    pagination_class = LimitOffsetPagination
+    ordering = ["id"]

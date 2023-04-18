@@ -11,6 +11,7 @@ from api.models import (
     Sector,
     Supplement,
     Weight,
+    DietSupplement
 )
 
 # Register your models here.
@@ -24,3 +25,4 @@ admin.site.register(PriceHistory)
 admin.site.register(Sector)
 admin.site.register(Supplement)
 admin.site.register(Weight)
+admin.site.register(DietSupplement)
