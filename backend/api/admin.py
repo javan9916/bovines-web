@@ -1,3 +1,5 @@
+from django.contrib import admin
+
 from api.models import (
     Animal,
     Category,
@@ -9,8 +11,8 @@ from api.models import (
     Sector,
     Supplement,
     Weight,
+    DietSupplement
 )
-from django.contrib import admin
 
 # Register your models here.
 admin.site.register(Animal)
@@ -23,3 +25,4 @@ admin.site.register(PriceHistory)
 admin.site.register(Sector)
 admin.site.register(Supplement)
 admin.site.register(Weight)
+admin.site.register(DietSupplement)
