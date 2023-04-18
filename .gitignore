@@ -157,3 +157,6 @@ dmypy.json
 
 # executables
 *.bat
+
+# VS
+.vscode
