@@ -14,10 +14,13 @@ from api.models.PriceHistory import PriceHistory
 
 from api.serializers.Supplement import SupplementSerializer
 
+from rest_framework.permissions import IsAuthenticated
+
 
 class SupplementViewSet(ModelViewSet):
     queryset = Supplement.objects.all()
     serializer_class = SupplementSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     pagination_class = LimitOffsetPagination
 

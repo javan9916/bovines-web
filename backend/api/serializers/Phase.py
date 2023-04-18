@@ -6,7 +6,6 @@ from api.serializers.Diet import DietSerializer
 
 
 class PhaseSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Phase
         fields = "__all__"

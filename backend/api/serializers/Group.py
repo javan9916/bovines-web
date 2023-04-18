@@ -22,7 +22,7 @@ class GroupSerializer(serializers.ModelSerializer):
         validated_data["sector_id"] = sector_pk
 
         animals = request.data.get("animals")
-        animals_data = [animal['id'] for animal in animals]
+        animals_data = [animal["id"] for animal in animals]
         validated_data["animals"] = animals_data
 
         return super().create(validated_data)
@@ -34,6 +34,6 @@ class GroupSerializer(serializers.ModelSerializer):
         validated_data["sector_id"] = sector_pk
 
         animals = request.data.get("animals")
-        animals_data = [animal['id'] for animal in animals]
+        animals_data = [animal["id"] for animal in animals]
         validated_data["animals"] = animals_data
         return super().update(instance, validated_data)

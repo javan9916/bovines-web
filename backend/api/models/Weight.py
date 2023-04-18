@@ -10,6 +10,5 @@ class Weight(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"animal: { self.animal }, peso: { self.weight }, "
-            f"fecha: { self.date }"
+            f"animal: { self.animal }, peso: { self.weight }, " f"fecha: { self.date }"
         )

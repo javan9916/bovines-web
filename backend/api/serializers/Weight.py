@@ -30,7 +30,7 @@ class WeightSerializer(serializers.ModelSerializer):
             return 0
         gpd = (instance.weight - previous.weight) / date_difference.days
         return round(gpd, 2)
-    
+
     def get_gpt(self, instance):
         first = Weight.objects.filter(animal=instance.animal).order_by("date").first()
         date_difference = instance.date - first.date
@@ -38,7 +38,7 @@ class WeightSerializer(serializers.ModelSerializer):
             return 0
         gpt = (instance.weight - first.weight) / date_difference.days
         return round(gpt, 2)
-    
+
     def get_fca(self, instance):
         previous = None
         weights = Weight.objects.filter(animal=instance.animal).order_by("date")
@@ -53,12 +53,14 @@ class WeightSerializer(serializers.ModelSerializer):
         date_difference = instance.date - previous.date
         if date_difference.days == 0:
             return 0
-        
+
         gained_weight = instance.weight - previous.weight
         print(previous.animal.phase)
-        food_consumption = previous.animal.phase.diet.total_weight * date_difference.days
+        food_consumption = (
+            previous.animal.phase.diet.total_weight * date_difference.days
+        )
         if gained_weight == 0:
             return 0
-        
+
         fca = food_consumption / gained_weight
         return round(fca, 2)

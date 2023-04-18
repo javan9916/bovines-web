@@ -6,6 +6,7 @@ from rest_framework import status
 
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -18,6 +19,7 @@ from api.models.DietSupplement import DietSupplement
 class DietViewSet(ModelViewSet):
     queryset = Diet.objects.all()
     serializer_class = DietSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     pagination_class = LimitOffsetPagination
 
@@ -37,18 +39,26 @@ class DietViewSet(ModelViewSet):
 
     def create_diet_supplement(self, diet, supplements):
         try:
-            supplement_costs = [(int(supplement['quantity']) / int(supplement['kg_presentation'])) * int(supplement['prices'][0]['price']) for supplement in supplements]
+            supplement_costs = [
+                (int(supplement["quantity"]) / int(supplement["kg_presentation"]))
+                * int(supplement["prices"][0]["price"])
+                for supplement in supplements
+            ]
             total_cost = sum(supplement_costs)
             diet.total_cost = total_cost
 
-            supplement_weights = [int(supplement['quantity']) for supplement in supplements]
+            supplement_weights = [
+                int(supplement["quantity"]) for supplement in supplements
+            ]
             total_weight = sum(supplement_weights)
             diet.total_weight = total_weight
             diet.save()
 
             diet_supplements = [
                 DietSupplement(
-                    diet_id=diet.id, supplement_id=supplement['id'], quantity=supplement['quantity']
+                    diet_id=diet.id,
+                    supplement_id=supplement["id"],
+                    quantity=supplement["quantity"],
                 )
                 for supplement in supplements
             ]
@@ -68,14 +78,20 @@ class DietViewSet(ModelViewSet):
             self.update_diet_supplement(diet=instance, supplements=supplements)
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def update_diet_supplement(self, diet, supplements):
         try:
-            supplement_costs = [(int(supplement['quantity']) / int(supplement['kg_presentation'])) * int(supplement['prices'][0]['price']) for supplement in supplements]
+            supplement_costs = [
+                (int(supplement["quantity"]) / int(supplement["kg_presentation"]))
+                * int(supplement["prices"][0]["price"])
+                for supplement in supplements
+            ]
             total_cost = sum(supplement_costs)
             diet.total_cost = total_cost
 
-            supplement_weights = [int(supplement['quantity']) for supplement in supplements]
+            supplement_weights = [
+                int(supplement["quantity"]) for supplement in supplements
+            ]
             total_weight = sum(supplement_weights)
             diet.total_weight = total_weight
             diet.save()
@@ -83,7 +99,9 @@ class DietViewSet(ModelViewSet):
             DietSupplement.objects.filter(diet_id=diet.id).delete()
             diet_supplements = [
                 DietSupplement(
-                    diet_id=diet.id, supplement_id=supplement['id'], quantity=supplement['quantity']
+                    diet_id=diet.id,
+                    supplement_id=supplement["id"],
+                    quantity=supplement["quantity"],
                 )
                 for supplement in supplements
             ]

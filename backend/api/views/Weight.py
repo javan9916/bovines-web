@@ -4,6 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 
 from api.models.Weight import Weight
 from api.models.Phase import Phase
@@ -18,6 +19,7 @@ from api.views.Animal import Animal
 class WeightViewSet(ModelViewSet):
     queryset = Weight.objects.all()
     serializer_class = WeightSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [OrderingFilter]
     ordering = ["date"]
 
@@ -55,7 +57,7 @@ class WeightViewSet(ModelViewSet):
             animal.phase = Phase.objects.filter(
                 min_weight__lte=arrival_weight, max_weight__gte=arrival_weight
             ).first()
-            
+
             animal.save()
             return True
         except Exception as e:
@@ -76,7 +78,7 @@ class WeightViewSet(ModelViewSet):
                 type="I",
                 category=Category.objects.get(pk=self.ANIMAL_CATEGORY_ID),
                 cost=animal.value,
-                date=weights[-1].date
+                date=weights[-1].date,
             )
             cost.save()
             animal.cost = cost
