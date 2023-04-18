@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom'
 
 
 export default function Error(props) {
-    const { code } = props
-
     const navigate = useNavigate()
 
+    const { code } = props
+    
     return (
         <>
             <div className='centered-flex-container flex-column'>

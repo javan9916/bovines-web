@@ -10,11 +10,11 @@ const navigation = [
 
 export default function Header(props) {
     const displayMenu = () => {
-        var x = document.getElementById('nav');
+        var x = document.getElementById('nav')
         if (x.className === 'nav')
-            x.className += ' responsive';
+            x.className += ' responsive'
         else
-            x.className = 'nav';
+            x.className = 'nav'
     }
 
     return (

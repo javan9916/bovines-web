@@ -1,21 +1,29 @@
 import { useState, useEffect } from 'react'
 
 import { HiPencil, HiTrash } from 'react-icons/hi'
+import { useNavigate } from 'react-router-dom'
 
 
 const Row = (props) => {
-    const { head, content, deleteRow, index } = props
+    const navigate = useNavigate()
+
+    const { animal_id, head, content, deleteRow, index } = props
+    const show_actions = () => head && content.actions !== undefined
 
     return (
         <tr>
             {Object.keys(content).map((key) =>
                 head ?
-                    <th key={key}>{content[key]}</th>
+                    <th>{content[key]}</th>
                     :
-                    <td key={key}>{content[key]}</td>
+                    <td
+                        onClick={() => {
+                            navigate(`/animales/${animal_id}`)
+                        }}
+                    >{content[key]}</td>
             )}
             {
-                !head ?
+                !head & show_actions ?
                     <td key='actions' className='table-actions'>
                         <button className='fit'>
                             <HiPencil />
@@ -36,6 +44,7 @@ export default function Table(props) {
     const { headers, data, newRow, setNewRow } = props
 
     const [rows, setRows] = useState(data)
+    
 
     const deleteRow = (element) => {
         let elements = [...rows]
@@ -65,11 +74,16 @@ export default function Table(props) {
                 </thead>
                 <tbody>
                     {rows.map((row, index) =>
-                        <Row key={row.id} head={false} content={row} deleteRow={deleteRow} index={index} />
+                        <Row
+                            animal_id={row.badge_number}
+                            key={row.badge_number}
+                            head={false}
+                            content={row}
+                            deleteRow={deleteRow}
+                            index={index} />
                     )}
                 </tbody>
             </table>
         </>
-
     )
 } 
