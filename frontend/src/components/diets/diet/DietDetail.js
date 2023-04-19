@@ -20,7 +20,12 @@ export default function DietDetail() {
 
     function deleteDiet() {
         const url = baseURL + `api/diet/${id}`
-        fetch(url, { method: 'DELETE' })
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)
@@ -45,15 +50,25 @@ export default function DietDetail() {
             supplements: supplements.filter(supplement => supplement.isChecked)
         }
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const dietURL = baseURL + `api/diet/${id}/`
         const dietSupplementURL = baseURL + `api/diet_supplement/?diet_id=${id}`
         Promise.all([
             fetch(dietURL, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('access')}`
+                },
                 body: JSON.stringify(data)
             }).then(response => response.json()),
-            fetch(dietSupplementURL).then(response => response.json()),
+            fetch(dietSupplementURL, authHeaders).then(response => response.json()),
         ])
             .then(([dietData, dietSupplementData]) => {
                 toast.success('¡Editado correctamente!')
@@ -69,11 +84,18 @@ export default function DietDetail() {
     useEffect(() => {
         setLoading(true)
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const dietURL = baseURL + `api/diet/${id}`
         const dietSupplementURL = baseURL + `api/diet_supplement/?diet_id=${id}`
         Promise.all([
-            fetch(dietURL).then(response => response.json()),
-            fetch(dietSupplementURL).then(response => response.json()),
+            fetch(dietURL, authHeaders).then(response => response.json()),
+            fetch(dietSupplementURL, authHeaders).then(response => response.json()),
         ])
             .then(([dietData, dietSupplementData]) => {
                 setDiet(dietData)

@@ -38,7 +38,8 @@ export default function CreateGroup() {
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -64,11 +65,18 @@ export default function CreateGroup() {
     useEffect(() => {
         setLoading(true)
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const animalURL = baseURL + `api/animal/?group__isnull=${true}`
         const sectorURL = baseURL + `api/sector/?has_group=${false}`
         Promise.all([
-            fetch(animalURL).then(response => response.json()),
-            fetch(sectorURL).then(response => response.json())
+            fetch(animalURL, authHeaders).then(response => response.json()),
+            fetch(sectorURL, authHeaders).then(response => response.json())
         ])
             .then(([animalData, sectorData]) => {
                 animalData = animalData.map((animal) => ({ ...animal, isChecked: false }))

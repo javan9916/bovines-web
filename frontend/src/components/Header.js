@@ -1,5 +1,8 @@
+import { useContext } from 'react'
 import { NavLink } from 'react-router-dom'
+
 import { HiMenu } from 'react-icons/hi'
+import { LoginContext } from '../App'
 
 
 const navigation = [
@@ -9,6 +12,8 @@ const navigation = [
 ]
 
 export default function Header(props) {
+    const [loggedIn, setLoggedIn] = useContext(LoginContext)
+
     const displayMenu = () => {
         var x = document.getElementById('nav')
         if (x.className === 'nav')
@@ -19,8 +24,8 @@ export default function Header(props) {
 
     return (
         <>
-            <nav className='container-fluid nav' id='nav'>
-                <ul >
+            <nav className={loggedIn ? 'container-fluid nav' : 'container-fluid nav none'} id='nav'>
+                <ul>
                     <li key='nav'>
                         <button className='nav-icon' onClick={displayMenu}>
                             <HiMenu />
@@ -39,6 +44,19 @@ export default function Header(props) {
                             </li>
                         )
                     })}
+
+                    <li key='logout'>
+                        {loggedIn ?
+                            <NavLink
+                                to={'/login'}
+                                onClick={() => {
+                                    setLoggedIn(false)
+                                    localStorage.clear()
+                                }}> Cerrar sesión </NavLink>
+                            :
+                            <NavLink to={'/login'}> Iniciar sesión </NavLink>
+                        }
+                    </li>
                 </ul>
                 <ul>
                     <li><strong>Bovinos</strong></li>

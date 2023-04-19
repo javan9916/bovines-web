@@ -36,7 +36,12 @@ export default function AnimalList() {
         setLoading(true)
 
         const url = baseURL + `api/animal/?ordering=${order}&limit=${pageSize}&offset=${offset}&origin=${origin}&sex=${sex}&phase=${phase}`
-        fetch(url)
+        fetch(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

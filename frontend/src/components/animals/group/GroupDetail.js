@@ -20,7 +20,12 @@ export default function GroupDetail() {
 
     function deleteGroup() {
         const url = baseURL + `api/group/${id}`
-        fetch(url, { method: 'DELETE' })
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)
@@ -50,7 +55,8 @@ export default function GroupDetail() {
         fetch(url, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -76,11 +82,18 @@ export default function GroupDetail() {
     useEffect(() => {
         setLoading(true)
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const groupURL = baseURL + `api/group/${id}`
         const animalURL = baseURL + `api/animal/?group__isnull_or_equal=${id}`
         Promise.all([
-            fetch(groupURL).then(response => response.json()),
-            fetch(animalURL).then(response => response.json())
+            fetch(groupURL, authHeaders).then(response => response.json()),
+            fetch(animalURL, authHeaders).then(response => response.json())
         ])
             .then(([groupData, animalData]) => {
                 setGroup(groupData)

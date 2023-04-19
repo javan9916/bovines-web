@@ -32,7 +32,11 @@ export default function DietList() {
         setLoading(true)
 
         const url = baseURL + `api/diet/?ordering=${order}&limit=${pageSize}&offset=${offset}`
-        fetch(url)
+        fetch(url, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

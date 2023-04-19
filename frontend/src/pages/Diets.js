@@ -39,7 +39,8 @@ export default function Diets() {
         fetch(url, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -64,13 +65,20 @@ export default function Diets() {
     useEffect(() => {
         setLoading(true)
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const supplementURL = baseURL + 'api/supplement/'
         const dietURL = baseURL + 'api/diet/'
         const phaseURL = baseURL + 'api/phase/'
         Promise.all([
-            fetch(supplementURL).then(response => response.json()),
-            fetch(dietURL).then(response => response.json()),
-            fetch(phaseURL).then(response => response.json())
+            fetch(supplementURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
+            fetch(dietURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
+            fetch(phaseURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json())
         ])
             .then(([supplementData, dietData, phaseData]) => {
                 if (supplementData.length > 5)

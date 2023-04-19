@@ -36,7 +36,8 @@ export default function CreateWeight() {
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(body)
         })

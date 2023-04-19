@@ -35,11 +35,18 @@ export default function CostList() {
     useEffect(() => {
         setLoading(true)
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const costURL = baseURL + `api/cost/?ordering=${order}&limit=${pageSize}&offset=${offset}&type=${type}&category=${category}`
         const categoryURL = baseURL + `api/category/`
         Promise.all([
-            fetch(costURL).then(response => response.json()),
-            fetch(categoryURL).then(response => response.json())
+            fetch(costURL, authHeaders).then(response => response.json()),
+            fetch(categoryURL, authHeaders).then(response => response.json())
         ])
             .then(([costData, categoryData]) => {
                 setResponse(costData)

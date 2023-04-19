@@ -23,7 +23,12 @@ export default function AnimalDetail() {
 
     function deleteAnimal() {
         const url = baseURL + 'api/animal/' + id
-        fetch(url, { method: 'DELETE' })
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)
@@ -49,7 +54,8 @@ export default function AnimalDetail() {
         fetch(url, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -86,11 +92,18 @@ export default function AnimalDetail() {
     useEffect(() => {
         setLoading(true)
 
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const animalURL = baseURL + `api/animal/${id}`
         const groupURL = baseURL + `api/group/?animals=${id}`
         Promise.all([
-            fetch(animalURL).then(response => response.json()),
-            fetch(groupURL).then(response => response.json())
+            fetch(animalURL, authHeaders).then(response => response.json()),
+            fetch(groupURL, authHeaders).then(response => response.json())
         ])
             .then(([animalData, groupData]) => {
                 console.log(animalData)

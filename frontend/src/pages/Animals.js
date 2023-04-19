@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { HiPlus } from 'react-icons/hi'
 import { baseURL } from '../shared'
+import { LoginContext } from '../App'
 
 
 const animalHeaders = { badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
 const sectorHeaders = { name: 'Nombre', area: 'Área' }
 
 export default function Animals() {
+    const [loggedIn, setLoggedIn] = useContext(LoginContext)
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -22,13 +25,28 @@ export default function Animals() {
     useEffect(() => {
         setLoading(true)
 
+        const verification = (response) => {
+            if (response.status === 401) {
+                setLoggedIn(false)
+                navigate('/login')
+            } else
+                return response.json()
+        }
+
+        const authHeaders = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        }
+
         const animalURL = baseURL + 'api/animal/'
         const sectorURL = baseURL + 'api/sector/'
         const groupURL = baseURL + 'api/group/'
         Promise.all([
-            fetch(animalURL).then(response => response.json()),
-            fetch(sectorURL).then(response => response.json()),
-            fetch(groupURL).then(response => response.json())
+            fetch(animalURL, authHeaders).then(verification),
+            fetch(sectorURL, authHeaders).then(verification),
+            fetch(groupURL, authHeaders).then(verification)
         ])
             .then(([animalData, sectorData, groupData]) => {
                 setAnimalLength(animalData.length)
@@ -46,7 +64,7 @@ export default function Animals() {
                 setLoading(false)
             })
             .catch((e) => { console.log(e) })
-    }, [navigate])
+    }, [navigate, setLoggedIn])
 
     return (
         <main className='container'>

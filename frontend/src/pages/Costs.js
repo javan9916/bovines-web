@@ -19,11 +19,18 @@ export default function Costs() {
         setLoading(true)
 
         const url = baseURL + 'api/cost/'
-        fetch(url)
+        fetch(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)
                         navigate('/404')
+                    else if (response.status === 401)
+                        navigate('/login')
                     else
                         navigate('/500')
                 }
@@ -31,14 +38,14 @@ export default function Costs() {
             })
             .then((data) => {
                 setCostLength(data.length)
-            
+
                 if (data.length > 5)
                     data = data.slice(0, 5);
 
                 setCosts(data)
                 setLoading(false)
             })
-            .catch((e) => { console.log(e)} )
+            .catch((e) => { console.log(e) })
     }, [navigate])
 
     return (

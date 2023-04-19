@@ -33,7 +33,11 @@ export default function UpdateGroup(props) {
         setLoading(true)
 
         const url = baseURL + 'api/sector/'
-        fetch(url)
+        fetch(url, {
+            headers: {
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

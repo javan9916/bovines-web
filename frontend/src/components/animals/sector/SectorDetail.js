@@ -17,7 +17,12 @@ export default function SectorDetail() {
 
     function deleteSector() {
         const url = baseURL + `api/sector/${id}`
-        fetch(url, { method: 'DELETE' })
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            },
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

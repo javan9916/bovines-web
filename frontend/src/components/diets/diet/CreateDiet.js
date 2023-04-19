@@ -40,7 +40,8 @@ export default function CreateDiet() {
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -67,7 +68,11 @@ export default function CreateDiet() {
         setLoading(true)
 
         const url = baseURL + 'api/supplement/'
-        fetch(url)
+        fetch(url, {
+            headers: {
+                Authorization:  `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

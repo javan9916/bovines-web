@@ -1,4 +1,6 @@
+import { createContext, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import { Toaster } from 'react-hot-toast';
 
 import './index.css';
@@ -29,50 +31,95 @@ import SectorList from './components/animals/sector/SectorList';
 import CreateCost from './components/costs/CreateCost';
 import CostDetail from './components/costs/CostDetail';
 import CostList from './components/costs/CostList';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import { baseURL } from './shared';
 
+
+export const LoginContext = createContext()
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(localStorage.access ? true : false)
+
+  function changeLoggedIn(value) {
+    setLoggedIn(value)
+    if (!value) {
+      localStorage.clear()
+    }
+  }
+
+  useEffect(() => {
+    function refreshTokens() {
+      if (localStorage.refresh) {
+        const url = baseURL + 'api/token/refresh'
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            refresh: localStorage.refresh
+          })
+        })
+        .then(response => response.json())
+        .then((data) => {
+          localStorage.access = data.access
+          localStorage.refresh = data.refresh
+          setLoggedIn(true)
+        })
+      }
+    }
+
+    const minute = 1000 * 60
+    refreshTokens()
+    setInterval(refreshTokens, minute * 30)
+  }, [])
+
   return (
     <div className='App'>
-      <Toaster position='bottom-right'/>
-      <BrowserRouter>
-        <Header>
-          <Routes>
-            {/* Animal Routes */}
-            <Route path='/animales' element={<Animals />} />
-            <Route path='/animales/lista' element={<AnimalList />} />
-            <Route path='/animales/sectores/lista' element={<SectorList />} />
-            <Route path='/animales/:id' element={<AnimalDetail />}/>
-            <Route path='/animales/grupos/:id' element={<GroupDetail />}/>
-            <Route path='/animales/sectores/:id' element={<SectorDetail />}/>
-            <Route path='/animales/agregar_grupo' element={<CreateGroup />} />
-            <Route path='/animales/agregar_animal' element={<CreateAnimal />} />
-            <Route path='/animales/agregar_sector' element={<CreateSector />}></Route>
-            <Route path='/animales/:id/pesajes_iniciales' element={<CreateInitialWeights />} />
-            <Route path='/animales/:id/agregar_pesaje' element={<CreateWeight />} />
+      <LoginContext.Provider value={[loggedIn, changeLoggedIn]}>
+        <Toaster position='bottom-right' />
+        <BrowserRouter>
+          <Header>
+            <Routes>
+              {/* Animal Routes */}
+              <Route path='/animales' element={<Animals />} />
+              <Route path='/animales/lista' element={<AnimalList />} />
+              <Route path='/animales/sectores/lista' element={<SectorList />} />
+              <Route path='/animales/:id' element={<AnimalDetail />} />
+              <Route path='/animales/grupos/:id' element={<GroupDetail />} />
+              <Route path='/animales/sectores/:id' element={<SectorDetail />} />
+              <Route path='/animales/agregar_grupo' element={<CreateGroup />} />
+              <Route path='/animales/agregar_animal' element={<CreateAnimal />} />
+              <Route path='/animales/agregar_sector' element={<CreateSector />}></Route>
+              <Route path='/animales/:id/pesajes_iniciales' element={<CreateInitialWeights />} />
+              <Route path='/animales/:id/agregar_pesaje' element={<CreateWeight />} />
 
-            {/* Diet Routes */}
-            <Route path='/dietas' element={<Diets />} />
-            <Route path='/dietas/lista' element={<DietList />} />
-            <Route path='/dietas/suplementos/lista' element={<SupplementList />} />
-            <Route path='/dietas/:id' element={<DietDetail />} />
-            <Route path='/dietas/agregar_dieta' element={<CreateDiet />} />
-            <Route path='/dietas/suplementos/agregar_suplemento' element={<CreateSupplement />} />
-            <Route path='/dietas/suplementos/:id' element={<SupplementDetail />} />
-            <Route path='/dietas/suplementos/:id/agregar_precio' element={<CreatePrice />} />
+              {/* Diet Routes */}
+              <Route path='/dietas' element={<Diets />} />
+              <Route path='/dietas/lista' element={<DietList />} />
+              <Route path='/dietas/suplementos/lista' element={<SupplementList />} />
+              <Route path='/dietas/:id' element={<DietDetail />} />
+              <Route path='/dietas/agregar_dieta' element={<CreateDiet />} />
+              <Route path='/dietas/suplementos/agregar_suplemento' element={<CreateSupplement />} />
+              <Route path='/dietas/suplementos/:id' element={<SupplementDetail />} />
+              <Route path='/dietas/suplementos/:id/agregar_precio' element={<CreatePrice />} />
 
-            {/* Cost Routes */}
-            <Route path='/costos' element={<Costs />} />
-            <Route path='/costos/lista' element={<CostList />} />
-            <Route path='/costos/:id' element={<CostDetail />}/>
-            <Route path='/costos/agregar_costo' element={<CreateCost />} />
+              {/* Cost Routes */}
+              <Route path='/costos' element={<Costs />} />
+              <Route path='/costos/lista' element={<CostList />} />
+              <Route path='/costos/:id' element={<CostDetail />} />
+              <Route path='/costos/agregar_costo' element={<CreateCost />} />
 
-            {/* General Routes */}
-            <Route path='/404' element={<Error code={404} />} />
-            <Route path='*' element={<Error code={500} />} />
-          </Routes>
-        </Header>
-      </BrowserRouter>
+              {/* General Routes */}
+              <Route path='/' element={<Dashboard />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/404' element={<Error code={404} />} />
+              <Route path='*' element={<Error code={500} />} />
+            </Routes>
+          </Header>
+        </BrowserRouter>
+      </LoginContext.Provider>
     </div>
   );
 }
