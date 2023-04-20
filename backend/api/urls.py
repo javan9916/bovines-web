@@ -14,6 +14,7 @@ from api.views import (
     Sector,
     Supplement,
     Weight,
+    User
 )
 
 
@@ -31,6 +32,7 @@ router.register("price_history", PriceHistory.PriceHistoryViewSet, "price_histor
 router.register("sector", Sector.SectorViewSet, "sector")
 router.register("supplement", Supplement.SupplementViewSet, "supplement")
 router.register("weight", Weight.WeightViewSet, "weight")
+router.register("user", User.UserViewSet, "user")
 
 
 urlpatterns = [

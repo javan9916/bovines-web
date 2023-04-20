@@ -68,8 +68,13 @@ export default function Login() {
                         />
                         <button type='submit'>Iniciar sesión</button>
                     </form>
+                    <hr className='separator-30-margin' />
+                    <button onClick={() => navigate('/register')}>
+                        Nuevo usuario
+                    </button>
                 </div>
             </article>
+            
         </main>
     )
 }

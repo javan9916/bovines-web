@@ -31,6 +31,7 @@ import SectorList from './components/animals/sector/SectorList';
 import CreateCost from './components/costs/CreateCost';
 import CostDetail from './components/costs/CostDetail';
 import CostList from './components/costs/CostList';
+import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { baseURL } from './shared';
@@ -113,6 +114,7 @@ function App() {
 
               {/* General Routes */}
               <Route path='/' element={<Dashboard />} />
+              <Route path='/register' element={<Register />} />
               <Route path='/login' element={<Login />} />
               <Route path='/404' element={<Error code={404} />} />
               <Route path='*' element={<Error code={500} />} />

@@ -5,6 +5,13 @@
     margin-top: 0;
 }
 
+.separator-30-margin {
+    border-top: 0.1px solid;
+    color: lightgrey;
+    margin-bottom: 30px;
+    margin-top: 0;
+}
+
 .no-decoration {
     text-decoration: none;
 }
