@@ -22,7 +22,7 @@ export default function AnimalDetail() {
     const { id } = useParams()
 
     function deleteAnimal() {
-        const url = baseURL + 'api/animal/' + id
+        const url = baseURL + 'animals/api/animals/' + id
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -50,7 +50,7 @@ export default function AnimalDetail() {
         const { sex, breed, origin, cost_per_kg } = updateData
         const data = { sex, breed, origin, cost_per_kg }
 
-        const url = baseURL + `api/animal/${id}/`
+        const url = baseURL + `animals/api/animals/${id}/`
         fetch(url, {
             method: 'PUT',
             headers: {
@@ -95,18 +95,17 @@ export default function AnimalDetail() {
         const authHeaders = {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         }
 
-        const animalURL = baseURL + `api/animal/${id}`
-        const groupURL = baseURL + `api/group/?animals=${id}`
+        const animalURL = baseURL + `animals/api/animals/${id}`
+        const groupURL = baseURL + `animals/api/groups/?animals=${id}`
         Promise.all([
             fetch(animalURL, authHeaders).then(response => response.json()),
             fetch(groupURL, authHeaders).then(response => response.json())
         ])
             .then(([animalData, groupData]) => {
-                console.log(animalData)
                 setAnimal(animalData)
                 doDates(animalData.weights)
 

@@ -32,10 +32,10 @@ export default function UpdateGroup(props) {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + 'api/sector/'
+        const url = baseURL + 'animals/api/sectors/'
         fetch(url, {
             headers: {
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         })
             .then((response) => {

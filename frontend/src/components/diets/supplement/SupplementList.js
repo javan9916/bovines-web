@@ -31,8 +31,12 @@ export default function SupplementList() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + `api/supplement/?ordering=${order}&limit=${pageSize}&offset=${offset}`
-        fetch(url)
+        const url = baseURL + `diets/api/supplements/?ordering=${order}&limit=${pageSize}&offset=${offset}`
+        fetch(url, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

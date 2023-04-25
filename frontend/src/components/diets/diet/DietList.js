@@ -31,7 +31,7 @@ export default function DietList() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + `api/diet/?ordering=${order}&limit=${pageSize}&offset=${offset}`
+        const url = baseURL + `diets/api/diets/?ordering=${order}&limit=${pageSize}&offset=${offset}`
         fetch(url, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('access')}`

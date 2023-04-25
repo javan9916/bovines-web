@@ -19,11 +19,11 @@ export default function GroupDetail() {
     const { id } = useParams()
 
     function deleteGroup() {
-        const url = baseURL + `api/group/${id}`
+        const url = baseURL + `animals/api/groups/${id}`
         fetch(url, {
             method: 'DELETE',
             headers: {
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         })
             .then((response) => {
@@ -51,12 +51,12 @@ export default function GroupDetail() {
             animals: animals.filter(animal => animal.isChecked)
         }
 
-        const url = baseURL + `api/group/${id}/`
+        const url = baseURL + `animals/api/groups/${id}/`
         fetch(url, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -85,12 +85,12 @@ export default function GroupDetail() {
         const authHeaders = {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         }
 
-        const groupURL = baseURL + `api/group/${id}`
-        const animalURL = baseURL + `api/animal/?group__isnull_or_equal=${id}`
+        const groupURL = baseURL + `animals/api/groups/${id}`
+        const animalURL = baseURL + `animals/api/animals/?group__isnull_or_equal=${id}`
         Promise.all([
             fetch(groupURL, authHeaders).then(response => response.json()),
             fetch(animalURL, authHeaders).then(response => response.json())

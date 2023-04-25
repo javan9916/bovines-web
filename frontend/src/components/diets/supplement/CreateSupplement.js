@@ -26,11 +26,12 @@ export default function CreateSupplement() {
             kg_presentation: kg
         }
 
-        const url = baseURL + 'api/supplement/'
+        const url = baseURL + 'diets/api/supplements/'
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })

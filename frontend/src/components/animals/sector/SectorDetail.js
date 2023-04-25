@@ -16,11 +16,11 @@ export default function SectorDetail() {
     const { id } = useParams()
 
     function deleteSector() {
-        const url = baseURL + `api/sector/${id}`
+        const url = baseURL + `animals/api/sectors/${id}`
         fetch(url, {
             method: 'DELETE',
             headers: {
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
         })
             .then((response) => {
@@ -47,11 +47,12 @@ export default function SectorDetail() {
             area: area
         }
 
-        const url = baseURL + `api/sector/${id}/`
+        const url = baseURL + `animals/api/sectors/${id}/`
         fetch(url, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -77,8 +78,12 @@ export default function SectorDetail() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + `api/sector/${id}`
-        fetch(url)
+        const url = baseURL + `animals/api/sectors/${id}`
+        fetch(url, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

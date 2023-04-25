@@ -32,12 +32,12 @@ export default function CreateWeight() {
             }
         }
 
-        const url = baseURL + 'api/weight/'
+        const url = baseURL + 'animals/api/weights/'
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(body)
         })

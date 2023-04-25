@@ -22,12 +22,12 @@ export default function CreateSector() {
             area: area
         }
 
-        const url = baseURL + 'api/sector/'
+        const url = baseURL + 'animals/api/sectors/'
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })

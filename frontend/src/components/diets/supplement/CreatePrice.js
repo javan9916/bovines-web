@@ -23,11 +23,12 @@ export default function CreatePrice() {
             supplement: id
         }
 
-        const url = baseURL + 'api/price_history/'
+        const url = baseURL + 'diets/api/price_history/'
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })

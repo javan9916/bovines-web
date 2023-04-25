@@ -31,7 +31,7 @@ export default function SectorList() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + `api/sector/?ordering=${order}&limit=${pageSize}&offset=${offset}`
+        const url = baseURL + `animals/api/sectors/?ordering=${order}&limit=${pageSize}&offset=${offset}`
         fetch(url, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('access')}`

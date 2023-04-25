@@ -21,7 +21,7 @@ export default function Login() {
             password: password
         }
 
-        const url = baseURL + 'api/token'
+        const url = baseURL + 'users/api/token'
         fetch(url, {
             method: 'POST',
             headers: {

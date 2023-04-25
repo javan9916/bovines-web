@@ -40,9 +40,9 @@ export default function Animals() {
             }
         }
 
-        const animalURL = baseURL + 'api/animal/'
-        const sectorURL = baseURL + 'api/sector/'
-        const groupURL = baseURL + 'api/group/'
+        const animalURL = baseURL + 'animals/api/animals/'
+        const sectorURL = baseURL + 'animals/api/sectors/'
+        const groupURL = baseURL + 'animals/api/groups/'
         Promise.all([
             fetch(animalURL, authHeaders).then(verification),
             fetch(sectorURL, authHeaders).then(verification),

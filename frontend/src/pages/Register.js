@@ -34,7 +34,7 @@ export default function Register() {
             password: password
         }
 
-        const url = baseURL + 'api/user/'
+        const url = baseURL + 'users/api/users/'
         fetch(url, {
             method: 'POST',
             headers: {

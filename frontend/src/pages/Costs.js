@@ -6,7 +6,8 @@ import { HiPlus } from 'react-icons/hi'
 import { baseURL } from '../shared'
 
 
-const headers = { name: 'Nombre', type: 'Tipo', cost: 'Costo' }
+const costHeaders = { name: 'Nombre', type: 'Tipo', cost: 'Costo' }
+const categoryHeaders = { id: 'ID', name: 'Categoría' }
 
 export default function Costs() {
     const navigate = useNavigate()
@@ -15,34 +16,36 @@ export default function Costs() {
     const [costs, setCosts] = useState()
     const [costLength, setCostLength] = useState()
 
+    const [categories, setCategories] = useState()
+    const [categoriesLength, setCategoriesLength] = useState()
+
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + 'api/cost/'
-        fetch(url, {
+        const authHeaders = {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('access')}`
             }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else if (response.status === 401)
-                        navigate('/login')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setCostLength(data.length)
+        }
 
-                if (data.length > 5)
-                    data = data.slice(0, 5);
+        const costURL = baseURL + 'costs/api/costs/'
+        const categoryURL = baseURL + 'costs/api/categories/'
+        Promise.all([
+            fetch(costURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
+            fetch(categoryURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json())
+        ])
+            .then(([costData, categoryData]) => {
+                setCostLength(costData.length)
+                if (costData.length)
+                    costData.slice(0, 5)
+                setCosts(costData)
 
-                setCosts(data)
+                setCategoriesLength(categoryData.length)
+                if (categoryData.length)
+                    categoryData.slice(0, 5)
+                setCategories(categoryData)
+
                 setLoading(false)
             })
             .catch((e) => { console.log(e) })
@@ -75,8 +78,8 @@ export default function Costs() {
                                     <table>
                                         <thead>
                                             <tr key='headers'>
-                                                {Object.keys(headers).map((key) =>
-                                                    <th key={key}>{headers[key]}</th>
+                                                {Object.keys(costHeaders).map((key) =>
+                                                    <th key={key}>{costHeaders[key]}</th>
                                                 )}
                                             </tr>
                                         </thead>
@@ -97,6 +100,66 @@ export default function Costs() {
                                     {costLength > 5 ?
                                         <div className='centered-flex-container'>
                                             <button onClick={() => navigate('lista')} className='fit '>
+                                                Ver toda la lista
+                                            </button>
+                                        </div>
+                                        :
+                                        null
+                                    }
+                                </div>
+                                :
+                                <h4 className='centered-flex-container'>No hay animales en la base de datos</h4>
+                            }
+                        </>
+                    }
+                </div>
+            </section>
+            <section>
+                <div className='centered-flex-container'>
+                    <h1 className='flex-3 fit'>
+                        Categorías
+                    </h1>
+                    <button
+                        onClick={() => navigate('agregar_categoria')}
+                        className='fit flex-1 navlink-button flex-container no-decoration'>
+                        <HiPlus />
+                        &nbsp;
+                        <p>Nueva categoría</p>
+                    </button>
+                </div>
+                <div>
+                    {loading ?
+                        <div className='centered-flex-container'>
+                            <div className='loader' />
+                        </div>
+                        :
+                        <>
+                            {categories && categories.length ?
+                                <div>
+                                    <table>
+                                        <thead>
+                                            <tr key='headers'>
+                                                {Object.keys(categoryHeaders).map((key) =>
+                                                    <th key={key}>{categoryHeaders[key]}</th>
+                                                )}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {categories.map((category, key) =>
+                                                <tr
+                                                    key={key}
+                                                    onClick={() => {
+                                                        navigate(`/costos/categorias/${category.id}`)
+                                                    }}>
+                                                    <td>{category.id}</td>
+                                                    <td>{category.name}</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                    {categoriesLength > 5 ?
+                                        <div className='centered-flex-container'>
+                                            <button onClick={() => navigate('categorias/lista')} className='fit '>
                                                 Ver toda la lista
                                             </button>
                                         </div>

@@ -35,11 +35,11 @@ export default function AnimalList() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + `api/animal/?ordering=${order}&limit=${pageSize}&offset=${offset}&origin=${origin}&sex=${sex}&phase=${phase}`
+        const url = baseURL + `animals/api/animals/?ordering=${order}&limit=${pageSize}&offset=${offset}&origin=${origin}&sex=${sex}&phase=${phase}`
         fetch(url, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         })
             .then((response) => {
@@ -144,7 +144,7 @@ export default function AnimalList() {
                                                     {animal.origin === 'S' ? <td>Subasta</td> : <td>Finca</td>}
                                                     <td>{animal.value} colones</td>
                                                     {animal.phase ? <td>{animal.phase.name}</td> : <td>Sin pesajes</td>}
-                                                    
+
                                                 </tr>
                                             )}
                                         </tbody>

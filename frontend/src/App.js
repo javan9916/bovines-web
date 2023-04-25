@@ -28,9 +28,12 @@ import DietDetail from './components/diets/diet/DietDetail';
 import DietList from './components/diets/diet/DietList';
 
 import SectorList from './components/animals/sector/SectorList';
-import CreateCost from './components/costs/CreateCost';
-import CostDetail from './components/costs/CostDetail';
-import CostList from './components/costs/CostList';
+import CreateCost from './components/costs/costs/CreateCost';
+import CostDetail from './components/costs/costs/CostDetail';
+import CostList from './components/costs/costs/CostList';
+import CategoryList from './components/costs/category/CategoryList';
+import CategoryDetail from './components/costs/category/CategoryDetail';
+import CreateCategory from './components/costs/category/CreateCategory';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -52,7 +55,7 @@ function App() {
   useEffect(() => {
     function refreshTokens() {
       if (localStorage.refresh) {
-        const url = baseURL + 'api/token/refresh'
+        const url = baseURL + 'users/api/token/refresh'
         fetch(url, {
           method: 'POST',
           headers: {
@@ -111,6 +114,9 @@ function App() {
               <Route path='/costos/lista' element={<CostList />} />
               <Route path='/costos/:id' element={<CostDetail />} />
               <Route path='/costos/agregar_costo' element={<CreateCost />} />
+              <Route path='/costos/categorias/lista' element={<CategoryList />}/>
+              <Route path='/costos/categorias/:id' element={<CategoryDetail />}/>
+              <Route path='/costos/agregar_categoria' element={<CreateCategory />}/>
 
               {/* General Routes */}
               <Route path='/' element={<Dashboard />} />

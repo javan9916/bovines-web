@@ -20,8 +20,13 @@ export default function SupplementDetail() {
     const [supplement, setSupplement] = useState()
 
     function deleteSupplement() {
-        const url = baseURL + `api/supplement/${id}`
-        fetch(url, { method: 'DELETE' })
+        const url = baseURL + `diets/api/supplements/${id}`
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)
@@ -47,11 +52,12 @@ export default function SupplementDetail() {
             kg_presentation: kg
         }
 
-        const url = baseURL + `api/supplement/${id}/`
+        const url = baseURL + `diets/api/supplements/${id}/`
         fetch(url, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -77,8 +83,12 @@ export default function SupplementDetail() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + `api/supplement/${id}`
-        fetch(url)
+        const url = baseURL + `diets/api/supplements/${id}`
+        fetch(url, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

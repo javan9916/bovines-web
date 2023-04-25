@@ -28,7 +28,7 @@ export default function CreateAnimal() {
             cost_per_kg: costPerKG
         }
 
-        const url = baseURL + 'api/animal/'
+        const url = baseURL + 'animals/api/animals/'
         fetch(url, {
             method: 'POST',
             headers: {

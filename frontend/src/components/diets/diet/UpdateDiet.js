@@ -35,8 +35,12 @@ export default function UpdateDiet(props) {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + 'api/supplement/'
-        fetch(url)
+        const url = baseURL + 'diets/api/supplements/'
+        fetch(url, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('access')}`
+            }
+        })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status === 404)

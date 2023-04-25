@@ -19,7 +19,7 @@ export default function DietDetail() {
     const { id } = useParams()
 
     function deleteDiet() {
-        const url = baseURL + `api/diet/${id}`
+        const url = baseURL + `diets/api/diets/${id}`
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -57,8 +57,8 @@ export default function DietDetail() {
             }
         }
 
-        const dietURL = baseURL + `api/diet/${id}/`
-        const dietSupplementURL = baseURL + `api/diet_supplement/?diet_id=${id}`
+        const dietURL = baseURL + `diets/api/diets/${id}/`
+        const dietSupplementURL = baseURL + `diets/api/diet_supplements/?diet_id=${id}`
         Promise.all([
             fetch(dietURL, {
                 method: 'PUT',
@@ -91,8 +91,8 @@ export default function DietDetail() {
             }
         }
 
-        const dietURL = baseURL + `api/diet/${id}`
-        const dietSupplementURL = baseURL + `api/diet_supplement/?diet_id=${id}`
+        const dietURL = baseURL + `diets/api/diets/${id}`
+        const dietSupplementURL = baseURL + `diets/api/diet_supplements/?diet_id=${id}`
         Promise.all([
             fetch(dietURL, authHeaders).then(response => response.json()),
             fetch(dietSupplementURL, authHeaders).then(response => response.json()),

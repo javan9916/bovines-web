@@ -34,12 +34,12 @@ export default function CreateGroup() {
             animals: animals.filter(animal => animal.isChecked)
         }
 
-        const url = baseURL + 'api/group/'
+        const url = baseURL + 'animals/api/groups/'
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -68,12 +68,12 @@ export default function CreateGroup() {
         const authHeaders = {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         }
 
-        const animalURL = baseURL + `api/animal/?group__isnull=${true}`
-        const sectorURL = baseURL + `api/sector/?has_group=${false}`
+        const animalURL = baseURL + `animals/api/animals/?group__isnull=${true}`
+        const sectorURL = baseURL + `animals/api/sectors/?has_group=${false}`
         Promise.all([
             fetch(animalURL, authHeaders).then(response => response.json()),
             fetch(sectorURL, authHeaders).then(response => response.json())

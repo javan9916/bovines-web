@@ -36,12 +36,12 @@ export default function CreateDiet() {
             supplements: supplements.filter(supplement => supplement.isChecked)
         }
 
-        const url = baseURL + 'api/diet/'
+        const url = baseURL + 'diets/api/diets/'
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             },
             body: JSON.stringify(data)
         })
@@ -67,10 +67,10 @@ export default function CreateDiet() {
     useEffect(() => {
         setLoading(true)
 
-        const url = baseURL + 'api/supplement/'
+        const url = baseURL + 'diets/api/supplements/'
         fetch(url, {
             headers: {
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                Authorization: `Bearer ${localStorage.getItem('access')}`
             }
         })
             .then((response) => {

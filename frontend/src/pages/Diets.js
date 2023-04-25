@@ -35,7 +35,7 @@ export default function Diets() {
             diet: diet
         }
 
-        const url = baseURL + `api/phase/${phase}/`
+        const url = baseURL + `animals/api/phases/${phase}/`
         fetch(url, {
             method: 'PUT',
             headers: {
@@ -72,9 +72,9 @@ export default function Diets() {
             }
         }
 
-        const supplementURL = baseURL + 'api/supplement/'
-        const dietURL = baseURL + 'api/diet/'
-        const phaseURL = baseURL + 'api/phase/'
+        const supplementURL = baseURL + 'diets/api/supplements/'
+        const dietURL = baseURL + 'diets/api/diets/'
+        const phaseURL = baseURL + 'animals/api/phases/'
         Promise.all([
             fetch(supplementURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
             fetch(dietURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
