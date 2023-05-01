@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import Pagination from '../../Pagination'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { name: 'Nombre', kg_presentation: 'Presentación' }
 let pageSize = 10
 
 export default function SupplementList() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -30,28 +33,18 @@ export default function SupplementList() {
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const supplements = await api.get(`diets/api/supplements/?ordering=${order}&limit=${pageSize}&offset=${offset}`)
 
-        const url = baseURL + `diets/api/supplements/?ordering=${order}&limit=${pageSize}&offset=${offset}`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setResponse(data)
-                setSupplements(data.results)
+                setResponse(supplements.data)
+                setSupplements(supplements.data.results)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, order, currentPage, offset])
 
     return (

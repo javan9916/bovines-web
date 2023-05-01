@@ -1,55 +1,53 @@
 import { useEffect, useState } from 'react'
-
 import { useNavigate } from 'react-router-dom'
 
 import { HiPlus } from 'react-icons/hi'
-import { baseURL } from '../shared'
+import { toast } from 'react-hot-toast'
+import useAxios from '../utils/useAxios'
 
 
 const costHeaders = { name: 'Nombre', type: 'Tipo', cost: 'Costo' }
 const categoryHeaders = { id: 'ID', name: 'Categoría' }
 
 export default function Costs() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
     const [costs, setCosts] = useState()
-    const [costLength, setCostLength] = useState()
-
     const [categories, setCategories] = useState()
+
+    const [costLength, setCostLength] = useState()
     const [categoriesLength, setCategoriesLength] = useState()
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const costs = await api.get('costs/api/costs/')
+                const categories = await api.get('costs/api/categories/')
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
+                setCostLength(costs.data.length)
+                setCategoriesLength(categories.data.length)
+                
+                let costsList = costs.data
+                if (costs.data.length > 5)
+                    costsList = costs.data.slice(0, 5);
+                setCosts(costsList)
+
+                let categoriesList = categories.data
+                if (categories.data.length > 5)
+                    categoriesList = categories.data.slice(0, 5);
+                setCategories(categoriesList)
+                
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const costURL = baseURL + 'costs/api/costs/'
-        const categoryURL = baseURL + 'costs/api/categories/'
-        Promise.all([
-            fetch(costURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
-            fetch(categoryURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json())
-        ])
-            .then(([costData, categoryData]) => {
-                setCostLength(costData.length)
-                if (costData.length)
-                    costData.slice(0, 5)
-                setCosts(costData)
-
-                setCategoriesLength(categoryData.length)
-                if (categoryData.length)
-                    categoryData.slice(0, 5)
-                setCategories(categoryData)
-
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
-    }, [navigate])
+        fetchData()
+    }, [])
 
     return (
         <main className='container'>

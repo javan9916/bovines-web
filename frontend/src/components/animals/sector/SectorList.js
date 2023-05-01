@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import Pagination from '../../Pagination'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { name: 'Nombre', area: 'Área' }
 let pageSize = 10
 
 export default function SectorList() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -30,28 +33,18 @@ export default function SectorList() {
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const sectors = await api.get(`animals/api/sectors/?ordering=${order}&limit=${pageSize}&offset=${offset}`)
 
-        const url = baseURL + `animals/api/sectors/?ordering=${order}&limit=${pageSize}&offset=${offset}`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setResponse(data)
-                setSectors(data.results)
+                setResponse(sectors.data)
+                setSectors(sectors.data.results)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, order, currentPage, offset])
 
     return (

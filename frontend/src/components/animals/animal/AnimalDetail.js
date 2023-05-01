@@ -3,16 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
 import { HiPlus } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
 import UpdateAnimal from './UpdateAnimal'
 
 import humanizeDuration from 'humanize-duration'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { weight: 'Peso', date: 'Fecha de registro', gpd: 'GPD', gpt: 'GPT', fca: 'FCA' }
 
 export default function AnimalDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -21,61 +23,26 @@ export default function AnimalDetail() {
 
     const { id } = useParams()
 
-    function deleteAnimal() {
-        const url = baseURL + 'animals/api/animals/' + id
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`animals/api/animals/${id}/`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1) 
+        }
     }
 
-    function updateAnimal(updateData) {
+    const handleUpdate = async (data) => {
         setLoading(true)
+        const response = await api.put(`animals/api/animals/${id}/`, data)
 
-        const { sex, breed, origin, cost_per_kg } = updateData
-        const data = { sex, breed, origin, cost_per_kg }
-
-        const url = baseURL + `animals/api/animals/${id}/`
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                toast.success('¡Editado correctamente!')
-                setAnimal(data)
-                setLoading(false)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+        if (response.status === 200) {
+            toast.success('¡Editado correctamente!')
+            setAnimal(response.data)
+            setLoading(false)
+        }
     }
 
     function doDates(weights) {
@@ -91,30 +58,23 @@ export default function AnimalDetail() {
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const animal = await api.get(`animals/api/animals/${id}`)
+                const groups = await api.get(`animals/api/groups/?animals=${id}`)
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
+                setAnimal(animal.data)
+                doDates(animal.data.weights)
+
+                if (groups.data.length)
+                    setGroup(groups.data[0])
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const animalURL = baseURL + `animals/api/animals/${id}`
-        const groupURL = baseURL + `animals/api/groups/?animals=${id}`
-        Promise.all([
-            fetch(animalURL, authHeaders).then(response => response.json()),
-            fetch(groupURL, authHeaders).then(response => response.json())
-        ])
-            .then(([animalData, groupData]) => {
-                setAnimal(animalData)
-                doDates(animalData.weights)
-
-                if (groupData.length)
-                    setGroup(groupData[0])
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
-    }, [navigate, id])
+        fetchData()
+    }, [id])
 
     if (loading) {
         return (
@@ -132,13 +92,13 @@ export default function AnimalDetail() {
                         </h1>
                         <div className='centered-flex-container'>
                             <UpdateAnimal
-                                handleUpdate={updateAnimal}
+                                handleUpdate={handleUpdate}
                                 sex={animal.sex}
                                 breed={animal.breed}
                                 origin={animal.origin}
                                 cost_per_kg={animal.cost_per_kg}
                                 weights={animal.weights} />
-                            <DeleteModal handleDelete={deleteAnimal} title='este animal' />
+                            <DeleteModal handleDelete={handleDelete} title='este animal' />
                         </div>
                     </div>
 

@@ -1,42 +1,20 @@
 import { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { baseURL } from '../shared'
-import { LoginContext } from '../App'
+import AuthContext from '../context/AuthContext'
+
 
 export default function Login() {
-    const [loggedIn, setLoggedIn] = useContext(LoginContext)
-    const [loading, setLoading] = useState(false)
+    const { loginUser } = useContext(AuthContext);
     const navigate = useNavigate()
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    function doLogin(e) {
-        setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            username: username,
-            password: password
-        }
-
-        const url = baseURL + 'users/api/token'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                localStorage.setItem('access', data.access)
-                localStorage.setItem('refresh', data.refresh)
-                setLoggedIn(true)
-
-                navigate('/')
-            })
+    const handleSubmit = e => {
+        e.preventDefault();
+        loginUser(username, password)
     }
 
     return (
@@ -47,7 +25,7 @@ export default function Login() {
                         <h1>Inicio de sesión</h1>
                         <h2>Digite sus credenciales para ingresar</h2>
                     </hgroup>
-                    <form onSubmit={doLogin}>
+                    <form onSubmit={handleSubmit}>
                         <input
                             id='username'
                             name='username'
@@ -74,7 +52,7 @@ export default function Login() {
                     </button>
                 </div>
             </article>
-            
+
         </main>
     )
 }

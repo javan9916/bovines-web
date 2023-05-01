@@ -3,15 +3,17 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
 import { HiPlus } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
 import UpdateSupplement from './UpdateSupplement'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { price: 'Precio', date: 'Fecha de registro' }
 const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
 export default function SupplementDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -19,92 +21,42 @@ export default function SupplementDetail() {
 
     const [supplement, setSupplement] = useState()
 
-    function deleteSupplement() {
-        const url = baseURL + `diets/api/supplements/${id}`
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`diets/api/supplements/${id}`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1)
+        }
     }
 
-    function updateSupplement(updateData) {
+    const handleUpdate = async (data) => {
         setLoading(true)
+        const response = await api.put(`diets/api/supplements/${id}/`, data)
 
-        const { name, description, kg } = updateData
-        const data = {
-            name: name,
-            description: description,
-            kg_presentation: kg
+        if (response.status === 200) {
+            toast.success('¡Editado correctamente!')
+            setSupplement(response.data)
+            setLoading(false)
         }
-
-        const url = baseURL + `diets/api/supplements/${id}/`
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                toast.success('¡Editado correctamente!')
-                setSupplement(data)
-                setLoading(false)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const supplement = await api.get(`diets/api/supplements/${id}`)
 
-        const url = baseURL + `diets/api/supplements/${id}`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setSupplement(data)
+                setSupplement(supplement.data)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, id])
-
 
     if (loading) {
         return (
@@ -122,11 +74,11 @@ export default function SupplementDetail() {
                         </h1>
                         <div className='centered-flex-container'>
                             <UpdateSupplement
-                                handleUpdate={updateSupplement}
+                                handleUpdate={handleUpdate}
                                 name={supplement.name}
                                 description={supplement.description}
                                 kg={supplement.kg_presentation} />
-                            <DeleteModal handleDelete={deleteSupplement} object='este suplemento' />
+                            <DeleteModal handleDelete={handleDelete} object='este suplemento' />
                         </div>
                     </div>
 

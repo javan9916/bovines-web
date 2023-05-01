@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
 import { HiPencil } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { action: '', quantity: 'Cantidad', name: 'Nombre', kg_presentation: 'Presentación' }
 
 export default function UpdateDiet(props) {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
@@ -24,44 +27,36 @@ export default function UpdateDiet(props) {
         const supps = [...supplements]
         supps[index].isChecked = event.target.checked
         setSupplements(supps)
+        console.log('checked',supps)
     }
 
     function setQuantity(event, index) {
         const supps = [...supplements]
         supps[index].quantity = event.target.value
         setSupplements(supps)
+        console.log('quantity',supps)
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const supplements = await api.get(`diets/api/supplements/`)
 
-        const url = baseURL + 'diets/api/supplements/'
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                data = data.map((supplement) => {
+                const supplementsList = supplements.data.map(supplement => {
                     let object = dietSupplements.find(dietSupp => dietSupp.supplement.id === supplement.id)
                     if (object)
                         return { ...supplement, isChecked: true, quantity: object.quantity }
                     else
                         return { ...supplement, isChecked: false, quantity: 0 }
                 })
-                setSupplements(data)
+                setSupplements(supplementsList)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, dietSupplements])
 
     return (

@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import Pagination from '../../Pagination'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { id: 'ID', name: 'Nombre' }
 let pageSize = 10
 
 export default function CategoryList() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -18,7 +21,6 @@ export default function CategoryList() {
     const [currentPage, setCurrentPage] = useState(1)
     const [offset, setOffset] = useState()
     const [order, setOrder] = useState('id')
-
 
     function handleOrdering(value) {
         order.includes('-') ? setOrder(value) : setOrder(`-${value}`)
@@ -31,30 +33,18 @@ export default function CategoryList() {
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const categories = await api.get(`costs/api/categories/?ordering=${order}&limit=${pageSize}&offset=${offset}`)
 
-        const url = baseURL + `costs/api/categories/?ordering=${order}&limit=${pageSize}&offset=${offset}`
-        fetch(url, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(data => {
-                console.log(data)
-                setResponse(data)
-                setCategories(data.results)
+                setResponse(categories.data)
+                setCategories(categories.data.results)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, order, currentPage, offset])
 
 

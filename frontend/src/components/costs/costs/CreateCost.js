@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 export default function CreateCost() {
+    const api = useAxios()
+
     const todayDate = new Date()
     const formatDate = todayDate.getDate() < 10 ? `0${todayDate.getDate()}` : todayDate.getDate()
     const formatMonth = todayDate.getMonth() < 10 ? `0${todayDate.getMonth() + 1}` : todayDate.getMonth() + 1
@@ -15,84 +18,42 @@ export default function CreateCost() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [name, setName] = useState('')
-    const [type, setType] = useState('')
-    const [category, setCategory] = useState('')
-    const [cost, setCost] = useState('')
-    const [date, setDate] = useState(formattedDate)
+    const { register, handleSubmit } = useForm()
 
     const [categories, setCategories] = useState([])
 
-    function createCost(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            name: name,
-            type: type,
-            category: category,
-            cost: cost,
-            date: date
+        const response = await api.post('costs/api/costs/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'costs/api/costs/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const categories = await api.get(`costs/api/categories/`)
 
-        const url = baseURL + `costs/api/categories/`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setCategories(data)
+                setCategories(categories.data)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate])
 
     return (
         <main>
             <section>
                 <h1> Nuevo costo </h1>
-                <form onSubmit={createCost}>
+                <form onSubmit={onSubmit}>
                     <div className='grid'>
                         <label htmlFor='name'>
                             Nombre
@@ -101,9 +62,7 @@ export default function CreateCost() {
                                 name='name'
                                 type='text'
                                 placeholder='Nombre del costo'
-                                value={name}
-                                onChange={(e) => { setName(e.target.value) }}
-                                required />
+                                {...register('name', { required: true })} />
                         </label>
 
                         <label htmlFor='date'>
@@ -112,9 +71,7 @@ export default function CreateCost() {
                                 id='date'
                                 name='date'
                                 type='date'
-                                value={date}
-                                onChange={(e) => { setDate(e.target.value) }}
-                                required />
+                                {...register('date', { required: true, value: formattedDate })} />
                         </label>
 
                         <label htmlFor='cost'>
@@ -124,9 +81,7 @@ export default function CreateCost() {
                                 name='cost'
                                 type='number'
                                 placeholder='Total del costo'
-                                value={cost}
-                                onChange={(e) => { setCost(e.target.value) }}
-                                required />
+                                {...register('cost', { required: true })} />
                         </label>
                     </div>
 
@@ -136,9 +91,7 @@ export default function CreateCost() {
                             <select
                                 id='category'
                                 name='category'
-                                value={category}
-                                onChange={(e) => { setCategory(e.target.value) }}
-                                required>
+                                {...register('category', { required: true })}>
                                 <option value='' disabled>Seleccionar</option>
                                 {categories.map((category, key) =>
                                     <option key={key} value={category.id}>{category.name}</option>
@@ -151,9 +104,7 @@ export default function CreateCost() {
                             <select
                                 id='type'
                                 name='type'
-                                value={type}
-                                onChange={(e) => { setType(e.target.value) }}
-                                required>
+                                {...register('type', { required: true })}>
                                 <option value='' disabled>Seleccionar</option>
                                 <option value='I'>Inversión</option>
                                 <option value='G'>Gasto</option>

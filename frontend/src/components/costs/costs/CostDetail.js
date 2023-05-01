@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
+import useAxios from '../../../utils/useAxios'
 
 
 export default function CostDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -14,52 +16,30 @@ export default function CostDetail() {
 
     const { id } = useParams()
 
-    function deleteCost() {
-        const url = baseURL + `costs/api/costs/${id}`
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`costs/api/costs/${id}`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1) 
+        }
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const cost = await api.get(`costs/api/costs/${id}`)
 
-        const url = baseURL + `costs/api/costs/${id}`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setCost(data)
+                setCost(cost.data)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, id])
 
     if (loading) {
@@ -77,7 +57,7 @@ export default function CostDetail() {
                             {cost.name}
                         </h1>
                         <div className='centered-flex-container'>
-                            <DeleteModal handleDelete={deleteCost} title='este costo' />
+                            <DeleteModal handleDelete={handleDelete} title='este costo' />
                         </div>
                     </div>
 

@@ -4,16 +4,19 @@ import { toast } from 'react-hot-toast'
 
 import { HiCheck } from 'react-icons/hi'
 import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
+import { useForm } from 'react-hook-form'
 
 
 const headers = { action: '', badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
 
 export default function CreateGroup() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [name, setName] = useState('')
-    const [sector, setSector] = useState('')
+    const { register, handleSubmit } = useForm()
 
     const [sectors, setSectors] = useState([])
     const [animals, setAnimals] = useState([])
@@ -24,74 +27,43 @@ export default function CreateGroup() {
         setAnimals(animalList)
     }
 
-    function createGroup(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            name: name,
-            sector: sector,
-            animals: animals.filter(animal => animal.isChecked)
+        data.animals = animals.filter(animal => animal.isChecked)
+        const response = await api.post('animals/api/groups/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'animals/api/groups/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const animals = await api.get(`animals/api/animals/?group__isnull=${true}`)
+                const sectors = await api.get(`animals/api/sectors/?has_group=${false}`)
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
+                const animalsList = animals.data.map((animal) => ({ ...animal, isChecked: false }))
+                setAnimals(animalsList)
+                setSectors(sectors.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const animalURL = baseURL + `animals/api/animals/?group__isnull=${true}`
-        const sectorURL = baseURL + `animals/api/sectors/?has_group=${false}`
-        Promise.all([
-            fetch(animalURL, authHeaders).then(response => response.json()),
-            fetch(sectorURL, authHeaders).then(response => response.json())
-        ])
-            .then(([animalData, sectorData]) => {
-                animalData = animalData.map((animal) => ({ ...animal, isChecked: false }))
-                setAnimals(animalData)
-                setSectors(sectorData)
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+        fetchData()
     }, [navigate])
+
 
     return (
         <main>
             <section>
                 <h1>Nuevo grupo de animales</h1>
-                <form onSubmit={createGroup}>
+                <form onSubmit={onSubmit}>
                     <div className='grid'>
                         <label htmlFor='name'>
                             Nombre del grupo
@@ -100,18 +72,14 @@ export default function CreateGroup() {
                                 name='name'
                                 type='text'
                                 placeholder='Nombre del grupo'
-                                value={name}
-                                onChange={(e) => { setName(e.target.value) }}
-                                required />
+                                {...register('name', { required: true })} />
                         </label>
                         <label htmlFor='sector'>
                             Sector
                             <select
                                 id='sector'
                                 name='sector'
-                                value={sector}
-                                onChange={(e) => { setSector(e.target.value) }}
-                                required>
+                                {...register('sector', { required: true })}>
                                 <option value='' disabled>Seleccionar</option>
                                 {sectors.map((sector, key) =>
                                     <option key={key} value={sector.id}>{sector.name}</option>

@@ -1,60 +1,37 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 export default function CreateSector() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [name, setName] = useState('')
-    const [area, setArea] = useState('')
+    const { register, handleSubmit } = useForm()
 
-    function createSector(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            name: name,
-            area: area
+        const response = await api.post('animals/api/sectors/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'animals/api/sectors/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     return (
         <main>
             <section>
                 <h1> Nuevo sector </h1>
-                <form onSubmit={createSector}>
+                <form onSubmit={onSubmit}>
                     <div className='grid'>
                         <label htmlFor='name'>
                             Nombre
@@ -63,9 +40,7 @@ export default function CreateSector() {
                                 name='name'
                                 type='text'
                                 placeholder='Nombre del sector'
-                                value={name}
-                                onChange={(e) => { setName(e.target.value) }}
-                                required />
+                                {...register('name', { required: true })} />
                         </label>
 
                         <label htmlFor='area'>
@@ -75,9 +50,7 @@ export default function CreateSector() {
                                 name='area'
                                 type='number'
                                 placeholder='Área del terreno'
-                                value={area}
-                                onChange={(e) => { setArea(e.target.value) }}
-                                required />
+                                {...register('area', { required: true })} />
                         </label>
                     </div>
 

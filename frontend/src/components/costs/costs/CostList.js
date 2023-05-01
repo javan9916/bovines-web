@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import Pagination from '../../Pagination'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { name: 'Nombre', type: 'Tipo', category: 'Categoría', date: 'Fecha', cost: 'Costo' }
 let pageSize = 10
 
 export default function CostList() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -34,28 +37,20 @@ export default function CostList() {
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const costs = await api.get(`costs/api/costs/?ordering=${order}&limit=${pageSize}&offset=${offset}&type=${type}&category=${category}`)
+                const categories = await api.get('costs/api/categories/')
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
+                setResponse(costs.data)
+                setCosts(costs.data.results)
+                setCategories(categories.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const costURL = baseURL + `costs/api/costs/?ordering=${order}&limit=${pageSize}&offset=${offset}&type=${type}&category=${category}`
-        const categoryURL = baseURL + `costs/api/categories/`
-        Promise.all([
-            fetch(costURL, authHeaders).then(response => response.json()),
-            fetch(categoryURL, authHeaders).then(response => response.json())
-        ])
-            .then(([costData, categoryData]) => {
-                setResponse(costData)
-                setCosts(costData.results)
-
-                setCategories(categoryData)
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+        fetchData()
     }, [navigate, order, type, category, currentPage, offset])
 
     return (

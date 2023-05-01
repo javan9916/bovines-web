@@ -3,100 +3,84 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
 import { HiPlus } from 'react-icons/hi'
-import { baseURL, ids } from '../shared'
+import useAxios from '../utils/useAxios'
 
 
 const dietHeaders = { name: 'Nombre', cost: 'Costo total' }
 const supplementHeaders = { name: 'Suplemento', price: 'Precio', kg_presentation: 'Presentación' }
 
 export default function Diets() {
+    const api = useAxios()
+
     const navigate = useNavigate()
-    const [loading, setLoading] = useState()
+    const [loading, setLoading] = useState(false)
 
     const [diets, setDiets] = useState()
     const [supplements, setSupplements] = useState()
     const [phases, setPhases] = useState()
 
+    const [dietLenght, setDietLenght] = useState()
+    const [supplementLenght, setSupplementLenght] = useState()
+
     const [endingPhase, setEndingPhase] = useState()
     const [gainingPhase, setGainingPhase] = useState()
     const [devPhase, setDevPhase] = useState()
 
-    function handleDietUpdate(diet, phase) {
+    const handleUpdate = async (diet, phase, id) => {
         setLoading(true)
 
-        if (phase === ids.ENDING_ID)
-            setEndingPhase(phase)
-        else if (phase === ids.GAINING_ID)
-            setGainingPhase(phase)
+        if (phase === 'end')
+            id ? setEndingPhase(id) : setEndingPhase(null)
+        else if (phase === 'gain')
+            id ? setEndingPhase(id) : setEndingPhase(null)
         else
-            setDevPhase(phase)
+            id ? setEndingPhase(id) : setEndingPhase(null)
 
         const data = {
             diet: diet
         }
 
-        const url = baseURL + `animals/api/phases/${phase}/`
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Editado correctamente!')
-                setLoading(false)
-            })
-            .catch((e) => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+        const response = await api.put(`animals/api/phases/${id}/`, data)
+
+        if (response.status === 200) {
+            toast.success('¡Editado correctamente!')
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const diets = await api.get('diets/api/diets/')
+                const supplements = await api.get('diets/api/supplements/')
+                const phases = await api.get('animals/api/phases/')
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization:  `Bearer ${localStorage.getItem('access')}`
+                setDietLenght(diets.data.length)
+                setSupplementLenght(supplements.data.length)
+
+                let dietsList = diets.data
+                if (diets.data.length > 5)
+                    dietsList = diets.data.slice(0, 5);
+                setDiets(dietsList)
+
+                let supplementsList = supplements.data
+                if (supplements.data.length > 5)
+                    supplementsList = supplements.data.slice(0, 5);
+                setSupplements(supplementsList)
+
+                setPhases(phases.data)
+                setDevPhase(phases.data[0].diet ? phases.data[0].diet : '')
+                setGainingPhase(phases.data[1].diet ? phases.data[1].diet : '')
+                setEndingPhase(phases.data[2].diet ? phases.data[2].diet : '')
+
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const supplementURL = baseURL + 'diets/api/supplements/'
-        const dietURL = baseURL + 'diets/api/diets/'
-        const phaseURL = baseURL + 'animals/api/phases/'
-        Promise.all([
-            fetch(supplementURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
-            fetch(dietURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json()),
-            fetch(phaseURL, authHeaders).then(response => response.status === 401 ? navigate('/login') : response.json())
-        ])
-            .then(([supplementData, dietData, phaseData]) => {
-                if (supplementData.length > 5)
-                    supplementData = supplementData.slice(0, 5);
-                setSupplements(supplementData)
-
-                if (dietData.length > 5)
-                    dietData = dietData.slice(0, 5);
-                setDiets(dietData)
-
-                setPhases(phaseData)
-                setDevPhase(phaseData[0].diet ? phaseData[0].diet : '')
-                setGainingPhase(phaseData[1].diet ? phaseData[1].diet : '')
-                setEndingPhase(phaseData[2].diet ? phaseData[2].diet : '')
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
-    }, [navigate, endingPhase, gainingPhase, devPhase])
+        fetchData()
+    }, [endingPhase, gainingPhase, devPhase])
 
     return (
         <main className='container'>
@@ -143,7 +127,7 @@ export default function Diets() {
                                             )}
                                         </tbody>
                                     </table>
-                                    {diets.length >= 5 ?
+                                    {dietLenght > 5 ?
                                         <div className='centered-flex-container'>
                                             <button onClick={() => navigate('lista')} className='fit '>
                                                 Ver toda la lista
@@ -205,7 +189,7 @@ export default function Diets() {
                                             )}
                                         </tbody>
                                     </table>
-                                    {supplements.length >= 5 ?
+                                    {supplementLenght > 5 ?
                                         <div className='centered-flex-container'>
                                             <button onClick={() => navigate('lista')} className='fit '>
                                                 Ver toda la lista
@@ -237,7 +221,7 @@ export default function Diets() {
                                     id={phases[0].id}
                                     name={phases[0].name}
                                     value={devPhase}
-                                    onChange={(e) => { handleDietUpdate(e.target.value, phases[0].id) }}
+                                    onChange={ e => handleUpdate(e.target.value, 'dev', phases[0].id) }
                                     required>
                                     <option value=''>Seleccionar</option>
                                     {diets.map((diet, key) =>
@@ -245,14 +229,13 @@ export default function Diets() {
                                     )}
                                 </select>
                             </label>
-
                             <label htmlFor={phases[1].name}>
                                 {phases[1].name}
                                 <select
                                     id={phases[1].id}
                                     name={phases[1].name}
                                     value={gainingPhase}
-                                    onChange={(e) => { handleDietUpdate(e.target.value, phases[1].id) }}
+                                    onChange={e => handleUpdate(e.target.value, 'gain', phases[1].id) }
                                     required>
                                     <option value=''>Seleccionar</option>
                                     {diets.map((diet, key) =>
@@ -267,7 +250,7 @@ export default function Diets() {
                                     id={phases[2].id}
                                     name={phases[2].name}
                                     value={endingPhase}
-                                    onChange={(e) => { handleDietUpdate(e.target.value, phases[2].id) }}
+                                    onChange={e => handleUpdate(e.target.value, 'end', phases[2].id) }
                                     required>
                                     <option value=''>Seleccionar</option>
                                     {diets.map((diet, key) =>

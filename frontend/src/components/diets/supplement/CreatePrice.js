@@ -1,71 +1,47 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 export default function CreatePrice() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [price, setPrice] = useState('')
+    const { register, handleSubmit } = useForm()
 
     const { id } = useParams()
 
-    function createPrice(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            price: price,
-            supplement: id
+        data.supplement = id
+        const response = await api.post('diets/api/price_history/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'diets/api/price_history/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     return (
         <main>
             <section>
                 <h1> Nuevo precio </h1>
-                <form onSubmit={createPrice}>
+                <form onSubmit={onSubmit}>
                     <label htmlFor='price'>
                         Precio
                         <input
                             id='price'
                             name='price'
                             type='number'
-                            placeholder='Precio del suplemento'
-                            value={price}
-                            onChange={(e) => { setPrice(e.target.value) }}
-                            required />
+                            {...register('price', { required: true })} />
                     </label>
 
                     <div className='centered-flex-container'>

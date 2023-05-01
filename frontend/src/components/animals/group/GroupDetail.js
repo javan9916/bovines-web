@@ -5,11 +5,14 @@ import { toast } from 'react-hot-toast'
 import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
 import UpdateGroup from './UpdateGroup'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
 
 export default function GroupDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState()
 
@@ -18,93 +21,49 @@ export default function GroupDetail() {
 
     const { id } = useParams()
 
-    function deleteGroup() {
-        const url = baseURL + `animals/api/groups/${id}`
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`animals/api/groups/${id}/`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1)
+        }
     }
 
-    function updateGroup(updateData) {
+    const handleUpdate = async (data) => {
         setLoading(true)
+        data.animals = animals.filter(animal => animal.isChecked)
+        const response = await api.put(`animals/api/groups/${id}/`, data)
 
-        const { name, sector, animals } = updateData
-        const data = {
-            name: name,
-            sector: sector,
-            animals: animals.filter(animal => animal.isChecked)
+        if (response.status === 200) {
+            toast.success('¡Editado correctamente!')
+            setGroup(response.data)
+            setLoading(false)
         }
-
-        const url = baseURL + `animals/api/groups/${id}/`
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                toast.success('¡Editado correctamente!')
-                setGroup(data)
-                setLoading(false)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const animals = await api.get(`animals/api/animals/?group__isnull_or_equal=${id}`)
+                const group = await api.get(`animals/api/groups/${id}`)
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        }
 
-        const groupURL = baseURL + `animals/api/groups/${id}`
-        const animalURL = baseURL + `animals/api/animals/?group__isnull_or_equal=${id}`
-        Promise.all([
-            fetch(groupURL, authHeaders).then(response => response.json()),
-            fetch(animalURL, authHeaders).then(response => response.json())
-        ])
-            .then(([groupData, animalData]) => {
-                setGroup(groupData)
+                setGroup(group.data)
 
-                setAnimals(animalData.map(animal => {
+                setAnimals(animals.data.map(animal => {
                     const checked = animal.group === parseInt(id)
                     return { ...animal, isChecked: checked }
                 }))
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, id])
 
     if (loading) {
@@ -123,11 +82,11 @@ export default function GroupDetail() {
                         </h1>
                         <div className='centered-flex-container'>
                             <UpdateGroup
-                                handleUpdate={updateGroup}
+                                handleUpdate={handleUpdate}
                                 name={group.name}
                                 sector={group.sector.id}
                                 animals={animals} />
-                            <DeleteModal handleDelete={deleteGroup} title='este grupo' />
+                            <DeleteModal handleDelete={handleDelete} title='este grupo' />
                         </div>
                     </div>
                     <section>

@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
 import UpdateDiet from './UpdateDiet'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { name: 'Suplemento', quantity: 'Cantidad' }
 
 export default function DietDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -18,92 +20,47 @@ export default function DietDetail() {
 
     const { id } = useParams()
 
-    function deleteDiet() {
-        const url = baseURL + `diets/api/diets/${id}`
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`diets/api/diets/${id}`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1)
+        }
     }
 
-    function updateDiet(updateData) {
+    const handleUpdate = async (data) => {
         setLoading(true)
 
-        const { name, supplements } = updateData
-        const data = {
-            name: name,
-            supplements: supplements.filter(supplement => supplement.isChecked)
-        }
+        data.supplements = data.supplements.filter(supplement => supplement.isChecked)
+        const diet = await api.put(`diets/api/diets/${id}/`, data)
+        const dietSupplements = await api.get(`diets/api/diet_supplements/?diet_id=${id}`)
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        }
+        if (diet.status === 200) toast.success('¡Editado correctamente!')
 
-        const dietURL = baseURL + `diets/api/diets/${id}/`
-        const dietSupplementURL = baseURL + `diets/api/diet_supplements/?diet_id=${id}`
-        Promise.all([
-            fetch(dietURL, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('access')}`
-                },
-                body: JSON.stringify(data)
-            }).then(response => response.json()),
-            fetch(dietSupplementURL, authHeaders).then(response => response.json()),
-        ])
-            .then(([dietData, dietSupplementData]) => {
-                toast.success('¡Editado correctamente!')
-                setDiet(dietData)
-                setDietSupplements(dietSupplementData)
-                setLoading(false)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+        setDiet(diet.data)
+        setDietSupplements(dietSupplements.data)
+        setLoading(false)
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const diet = await api.get(`diets/api/diets/${id}`)
+                const dietSupplements = await api.get(`diets/api/diet_supplements/?diet_id=${id}`)
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
+                setDiet(diet.data)
+                setDietSupplements(dietSupplements.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const dietURL = baseURL + `diets/api/diets/${id}`
-        const dietSupplementURL = baseURL + `diets/api/diet_supplements/?diet_id=${id}`
-        Promise.all([
-            fetch(dietURL, authHeaders).then(response => response.json()),
-            fetch(dietSupplementURL, authHeaders).then(response => response.json()),
-        ])
-            .then(([dietData, dietSupplementData]) => {
-                setDiet(dietData)
-                setDietSupplements(dietSupplementData)
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
-    }, [navigate, id])
+        fetchData()
+    }, [id])
 
     if (loading) {
         return (
@@ -121,10 +78,10 @@ export default function DietDetail() {
                         </h1>
                         <div className='centered-flex-container'>
                             <UpdateDiet
-                                handleUpdate={updateDiet}
+                                handleUpdate={handleUpdate}
                                 name={diet.name}
                                 dietSupplements={dietSupplements} />
-                            <DeleteModal handleDelete={deleteDiet} object='esta dieta' />
+                            <DeleteModal handleDelete={handleDelete} object='esta dieta' />
                         </div>
                     </div>
 
@@ -147,27 +104,26 @@ export default function DietDetail() {
                             </h2>
                         </div>
                         <div>
-                            {
-                                dietSupplements && dietSupplements.length ?
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(headers).map((key) =>
-                                                    <th key={key}>{headers[key]}</th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {dietSupplements.map((dietSupplement, key) =>
-                                                <tr key={key}>
-                                                    <td>{dietSupplement.supplement.name}</td>
-                                                    <td>{dietSupplement.quantity} KG</td>
-                                                </tr>
+                            {dietSupplements && dietSupplements.length ?
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(headers).map((key) =>
+                                                <th key={key}>{headers[key]}</th>
                                             )}
-                                        </tbody>
-                                    </table>
-                                    :
-                                    <h4 className='centered-flex-container'>No hay suplementos asociados a esta dieta</h4>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {dietSupplements.map((dietSupplement, key) =>
+                                            <tr key={key}>
+                                                <td>{dietSupplement.supplement.name}</td>
+                                                <td>{dietSupplement.quantity} KG</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                :
+                                <h4 className='centered-flex-container'>No hay suplementos asociados a esta dieta</h4>
                             }
 
                         </div>

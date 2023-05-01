@@ -1,66 +1,37 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 export default function CreateAnimal() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [badgeNumber, setBadgeNumber] = useState('')
-    const [sex, setSex] = useState('')
-    const [breed, setBreed] = useState('')
-    const [origin, setOrigin] = useState('')
-    const [costPerKG, setCostPerKG] = useState('')
+    const { register, handleSubmit } = useForm()
 
-    function createAnimal(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            sex: sex,
-            breed: breed,
-            origin: origin,
-            badge_number: badgeNumber,
-            cost_per_kg: costPerKG
+        const response = await api.post('animals/api/animals/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'animals/api/animals/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     return (
         <main>
             <section>
                 <h1> Nuevo animal </h1>
-                <form onSubmit={createAnimal}>
+                <form onSubmit={onSubmit}>
                     <div className='grid'>
                         <label htmlFor='badge_number'>
                             Identificador
@@ -69,9 +40,7 @@ export default function CreateAnimal() {
                                 name='badge_number'
                                 type='number'
                                 placeholder='Identificador del animal'
-                                value={badgeNumber}
-                                onChange={(e) => { setBadgeNumber(e.target.value) }}
-                                required />
+                                {...register('badge_number', { required: true })} />
                         </label>
 
                         <label htmlFor='cost_per_kg'>
@@ -81,9 +50,7 @@ export default function CreateAnimal() {
                                 name='cost_per_kg'
                                 type='number'
                                 placeholder='Precio del animal'
-                                value={costPerKG}
-                                onChange={(e) => { setCostPerKG(e.target.value) }}
-                                required />
+                                {...register('cost_per_kg', { required: true })} />
                         </label>
                     </div>
 
@@ -95,9 +62,7 @@ export default function CreateAnimal() {
                                 name='breed'
                                 type='text'
                                 placeholder='Raza del animal'
-                                value={breed}
-                                onChange={(e) => { setBreed(e.target.value) }}
-                                required />
+                                {...register('breed', { required: true })} />
                         </label>
 
                         <label htmlFor='origin'>
@@ -105,9 +70,7 @@ export default function CreateAnimal() {
                             <select
                                 id='origin'
                                 name='origin'
-                                value={origin}
-                                onChange={(e) => { setOrigin(e.target.value) }}
-                                required>
+                                {...register('origin', { required: true })} >
                                 <option value='' disabled>Seleccionar</option>
                                 <option value='F'>Finca</option>
                                 <option value='S'>Subasta</option>
@@ -119,9 +82,7 @@ export default function CreateAnimal() {
                             <select
                                 id='sex'
                                 name='sex'
-                                value={sex}
-                                onChange={(e) => { setSex(e.target.value) }}
-                                required>
+                                {...register('sex', { required: true })} >
                                 <option value='' disabled>Seleccionar</option>
                                 <option value='M'>Macho</option>
                                 <option value='H'>Hembra</option>

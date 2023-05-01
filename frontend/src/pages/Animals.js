@@ -1,70 +1,56 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { HiPlus } from 'react-icons/hi'
-import { baseURL } from '../shared'
-import { LoginContext } from '../App'
+import { toast } from 'react-hot-toast'
+import useAxios from '../utils/useAxios'
 
 
 const animalHeaders = { badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
 const sectorHeaders = { name: 'Nombre', area: 'Área' }
 
 export default function Animals() {
-    const [loggedIn, setLoggedIn] = useContext(LoginContext)
+    const api = useAxios()
 
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [animals, setAnimals] = useState()
-    const [sectors, setSectors] = useState()
-    const [groups, setGroups] = useState()
+    const [animals, setAnimals] = useState([])
+    const [sectors, setSectors] = useState([])
+    const [groups, setGroups] = useState([])
 
     const [animalLength, setAnimalLength] = useState()
     const [sectorLength, setSectorLength] = useState()
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const animals = await api.get('animals/api/animals/')
+                const sectors = await api.get('animals/api/sectors/')
+                const groups = await api.get('animals/api/groups/')
 
-        const verification = (response) => {
-            if (response.status === 401) {
-                setLoggedIn(false)
-                navigate('/login')
-            } else
-                return response.json()
-        }
+                setAnimalLength(animals.data.length)
+                setSectorLength(sectors.data.length)
 
-        const authHeaders = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
+                let animalsList = animals.data
+                if (animals.data.length > 5)
+                    animalsList = animals.data.slice(0, 5);
+                setAnimals(animalsList)
+
+                let sectorsList = sectors.data
+                if (sectors.data.length > 5)
+                    sectorsList = sectors.data.slice(0, 5);
+                setSectors(sectorsList)
+
+                setGroups(groups.data)
+                setLoading(false)
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
             }
         }
-
-        const animalURL = baseURL + 'animals/api/animals/'
-        const sectorURL = baseURL + 'animals/api/sectors/'
-        const groupURL = baseURL + 'animals/api/groups/'
-        Promise.all([
-            fetch(animalURL, authHeaders).then(verification),
-            fetch(sectorURL, authHeaders).then(verification),
-            fetch(groupURL, authHeaders).then(verification)
-        ])
-            .then(([animalData, sectorData, groupData]) => {
-                setAnimalLength(animalData.length)
-                setSectorLength(sectorData.length)
-
-                if (animalData.length > 5)
-                    animalData = animalData.slice(0, 5);
-                setAnimals(animalData)
-
-                if (sectorData.length > 5)
-                    sectorData = sectorData.slice(0, 5);
-                setSectors(sectorData)
-
-                setGroups(groupData)
-                setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
-    }, [navigate, setLoggedIn])
+        fetchData()
+    }, [])
 
     return (
         <main className='container'>

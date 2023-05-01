@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
 import UpdateSector from './UpdateSector'
+import useAxios from '../../../utils/useAxios'
 
 
 export default function SectorDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
@@ -15,89 +17,41 @@ export default function SectorDetail() {
 
     const { id } = useParams()
 
-    function deleteSector() {
-        const url = baseURL + `animals/api/sectors/${id}`
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`animals/api/sectors/${id}`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1) 
+        }
     }
 
-    function updateSector(updateData) {
+    const handleUpdate = async (data) => {
         setLoading(true)
+        const response = await api.put(`animals/api/sectors/${id}/`, data)
 
-        const { name, area } = updateData
-        const data = {
-            name: name,
-            area: area
+        if (response.status === 200) {
+            toast.success('¡Editado correctamente!')
+            setSector(response.data)
+            setLoading(false)
         }
-
-        const url = baseURL + `animals/api/sectors/${id}/`
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                toast.success('¡Editado correctamente!')
-                setSector(data)
-                setLoading(false)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const sector = await api.get(`animals/api/sectors/${id}`)
 
-        const url = baseURL + `animals/api/sectors/${id}`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setSector(data)
+                setSector(sector.data)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate, id])
 
     if (loading) {
@@ -116,10 +70,10 @@ export default function SectorDetail() {
                         </h1>
                         <div className='centered-flex-container'>
                             <UpdateSector
-                                handleUpdate={updateSector}
+                                handleUpdate={handleUpdate}
                                 name={sector.name}
                                 area={sector.area} />
-                            <DeleteModal handleDelete={deleteSector} title='este sector' />
+                            <DeleteModal handleDelete={handleDelete} title='este sector' />
                         </div>
                     </div>
 

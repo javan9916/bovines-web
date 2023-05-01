@@ -1,71 +1,29 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-hot-toast'
+import { useState, useContext } from 'react'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../shared'
+import AuthContext from '../context/AuthContext'
 
 
 export default function Register() {
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(false)
+    const { registerUser } = useContext(AuthContext)
 
     const [username, setUsername] = useState('')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [checkPassword, setCheckPassword] = useState('')
+    const [password2, setPassword2] = useState('')
 
-    function createUser(e) {
+    const handleSubmit = async e => {
         e.preventDefault()
-        
-        if (password !== checkPassword) {
-            toast.error('Las contraseñas deben coincidir')
-            return
-        }
-        setLoading(true)
-        
-        const data = {
-            username: username,
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            password: password
-        }
-
-        const url = baseURL + 'users/api/users/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate('/login')
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+        registerUser(username, firstName, lastName, email, password, password2)
     }
 
     return (
         <main>
             <section>
                 <h1> Nuevo usuario </h1>
-                <form onSubmit={createUser}>
+                <form onSubmit={handleSubmit}>
                     <div className='grid'>
                         <label htmlFor='username'>
                             Nombre de usuario
@@ -129,22 +87,22 @@ export default function Register() {
                                 required />
                         </label>
 
-                        <label htmlFor='check_password'>
+                        <label htmlFor='password2'>
                             Confirmar contraseña
                             <input
-                                id='check_password'
-                                name='check_password'
+                                id='password2'
+                                name='password2'
                                 type='password'
                                 placeholder='Contraseña'
-                                value={checkPassword}
-                                onChange={(e) => { setCheckPassword(e.target.value) }}
+                                value={password2}
+                                onChange={(e) => { setPassword2(e.target.value) }}
                                 required />
                         </label>
                     </div>
 
                     <div className='centered-flex-container'>
                         <div className='flex-3' />
-                        <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
+                        <button type='submit' className='flex-1 navlink-button flex-container no-decoration'>
                             <HiCheck />
                             &nbsp;
                             <p>Completar</p>

@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { action: '', quantity: 'Cantidad', name: 'Suplemento' }
 
 export default function CreateDiet() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState()
 
-    const [name, setName] = useState('')
+    const { register, handleSubmit } = useForm()
+
     const [supplements, setSupplements] = useState([])
 
     function setChecked(event, index) {
@@ -27,74 +31,40 @@ export default function CreateDiet() {
         setSupplements(supps)
     }
 
-    function createDiet(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            name: name,
-            supplements: supplements.filter(supplement => supplement.isChecked)
+        data.supplements = supplements.filter(supplement => supplement.isChecked)
+        const response = await api.post('diets/api/diets/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'diets/api/diets/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const supplements = await api.get('diets/api/supplements/')
 
-        const url = baseURL + 'diets/api/supplements/'
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                data = data.map((supplement) => ({ ...supplement, isChecked: false, quantity: 0 }))
-                setSupplements(data)
+                const supplementsList = supplements.data.map((supplement) => ({ ...supplement, isChecked: false, quantity: 0 }))
+                setSupplements(supplementsList)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate])
 
     return (
         <main>
             <section>
                 <h1> Nueva dieta </h1>
-                <form onSubmit={createDiet}>
+                <form onSubmit={onSubmit}>
                     <label htmlFor='name'>
                         Nombre
                         <input
@@ -102,9 +72,7 @@ export default function CreateDiet() {
                             name='name'
                             type='text'
                             placeholder='Nombre de la dieta'
-                            value={name}
-                            onChange={(e) => { setName(e.target.value) }}
-                            required />
+                            {...register('name', { required: true })} />
                     </label>
 
                     <h3>Suplementos</h3>
@@ -170,7 +138,6 @@ export default function CreateDiet() {
                     </div>
                 </form>
             </section>
-
         </main>
     )
 }

@@ -3,62 +3,35 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
+import { useForm } from 'react-hook-form'
 
 
 export default function CreateSupplement() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [name, setName] = useState('')
-    const [description, setDescription] = useState('')
-    const [price, setPrice] = useState('')
-    const [kg, setKg] = useState('')
+    const { register, handleSubmit } = useForm()
 
-    function createSupplement(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const data = {
-            name: name,
-            description: description,
-            price: price,
-            kg_presentation: kg
+        const response = await api.post('diets/api/supplements/', data)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'diets/api/supplements/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(data)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     return (
         <main>
             <section>
                 <h1> Nuevo suplemento </h1>
-                <form onSubmit={createSupplement}>
+                <form onSubmit={onSubmit}>
                     <label htmlFor='name'>
                         Nombre
                         <input
@@ -66,9 +39,7 @@ export default function CreateSupplement() {
                             name='name'
                             type='text'
                             placeholder='Nombre del suplemento'
-                            value={name}
-                            onChange={(e) => { setName(e.target.value) }}
-                            required />
+                            {...register('name', { required: true })} />
                     </label>
 
                     <div className='grid'>
@@ -80,9 +51,7 @@ export default function CreateSupplement() {
                                     name='kg'
                                     type='number'
                                     placeholder='Presentación del suplemento'
-                                    value={kg}
-                                    onChange={(e) => { setKg(e.target.value) }}
-                                    required />
+                                    {...register('kg_presentation', { required: true })} />
                                 <div className='centered-flex-container'>KG</div>
                             </div>
                         </label>
@@ -94,9 +63,7 @@ export default function CreateSupplement() {
                                 name='price'
                                 type='number'
                                 placeholder='Precio del suplemento'
-                                value={price}
-                                onChange={(e) => { setPrice(e.target.value) }}
-                                required />
+                                {...register('price', { required: true })} />
                         </label>
                     </div>
 
@@ -106,9 +73,7 @@ export default function CreateSupplement() {
                             id='description'
                             name='description'
                             placeholder='Descripción del suplemento'
-                            value={description}
-                            onChange={(e) => { setDescription(e.target.value) }}
-                            required />
+                            {...register('description', { required: true })} />
                     </label>
 
                     <div className='centered-flex-container'>

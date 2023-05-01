@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
+import useAxios from '../../../utils/useAxios'
 
 export default function CategoryDetail() {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState()
 
@@ -13,53 +15,31 @@ export default function CategoryDetail() {
 
     const { id } = useParams()
 
-    function deleteCategory() {
-        const url = baseURL + `costs/api/categories/${id}`
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                toast.success('¡Eliminado correctamente!')
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
+    const handleDelete = async () => {
+        setLoading(true)
+        const response = await api.delete(`costs/api/categories/${id}`)
+
+        if (response.status === 204) {
+            toast.success('Eliminado correctamente!')
+            setLoading(false)
+            navigate(-1) 
+        }
     }
 
     useEffect(() => {
         setLoading(true)
+        const fetchData = async () => {
+            try {
+                const category = await api.get(`costs/api/categories/${id}`)
 
-        const url = baseURL + `costs/api/categories/${id}`
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setCategory(data)
+                setCategory(category.data)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
-    }, [navigate, id])
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
+    }, [id])
 
     if (loading) {
         return (
@@ -76,7 +56,7 @@ export default function CategoryDetail() {
                             {category.name}
                         </h1>
                         <div className='centered-flex-container'>
-                            <DeleteModal handleDelete={deleteCategory} title='esta categoría' />
+                            <DeleteModal handleDelete={handleDelete} title='esta categoría' />
                         </div>
                     </div>
                 </main>

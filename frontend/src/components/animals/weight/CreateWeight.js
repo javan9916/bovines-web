@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
 
 import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
+
 
 
 export default function CreateWeight() {
+    const api = useAxios()
+
     const todayDate = new Date()
     const formatDate = todayDate.getDate() < 10 ? `0${todayDate.getDate()}` : todayDate.getDate()
     const formatMonth = todayDate.getMonth() < 10 ? `0${todayDate.getMonth() + 1}` : todayDate.getMonth() + 1
@@ -15,56 +19,29 @@ export default function CreateWeight() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const [weight, setWeight] = useState('')
-    const [weightDate, setWeightDate] = useState(formattedDate)
+    const { register, handleSubmit } = useForm()
 
     const { id } = useParams()
 
-    function createWeight(e) {
+    const onSubmit = handleSubmit(async data => {
         setLoading(true)
-        e.preventDefault()
 
-        const body = {
-            data: {
-                animal: id,
-                weight: weight,
-                date: weightDate
-            }
+        data.animal = id
+        const body = { data }
+        const response = await api.post('animals/api/weights/', body)
+
+        if (response.status === 201) {
+            toast.success('¡Creado correctamente!')
+            setLoading(false)
+            navigate(-1)
         }
-
-        const url = baseURL + 'animals/api/weights/'
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            },
-            body: JSON.stringify(body)
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then(() => {
-                toast.success('¡Creado correctamente!')
-                setLoading(false)
-                navigate(-1)
-            })
-            .catch(() => {
-                toast.error('Algo salió mal... Intenta de nuevo más tarde')
-            })
-    }
+    })
 
     return (
         <main>
             <section>
                 <h1>Nuevo pesaje</h1>
-                <form onSubmit={createWeight}>
+                <form onSubmit={onSubmit}>
                     <div className='grid'>
                         <label htmlFor='weight'>
                             Peso del animal
@@ -74,23 +51,19 @@ export default function CreateWeight() {
                                     name='weight'
                                     type='number'
                                     placeholder='Peso'
-                                    value={weight}
-                                    onChange={(e) => { setWeight(e.target.value) }}
-                                    required />
+                                    {...register('weight', { required: true })} />
                                 <div className='centered-flex-container'>KG</div>
                             </div>
                         </label>
 
-                        <label htmlFor='weight_date'>
+                        <label htmlFor='date'>
                             Fecha del pesaje
                             <input
-                                id='weight_date'
-                                name='weight_date'
+                                id='date'
+                                name='date'
                                 type='date'
                                 max={new Date().toISOString().split('T')[0]}
-                                value={weightDate}
-                                onChange={(e) => { setWeightDate(e.target.value) }}
-                                required />
+                                {...register('date', { required: true, value: formattedDate })} />
                         </label>
                     </div>
 

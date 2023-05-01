@@ -105,11 +105,16 @@ class WeightSerializer(serializers.ModelSerializer):
         date_difference = instance.date - previous.date
         if date_difference.days == 0:
             return 0
+        
+        print()
 
         gained_weight = instance.weight - previous.weight
-        food_consumption = (
-            previous.animal.phase.diet.total_weight * date_difference.days
-        )
+        food_consumption = 0
+        if previous.animal.phase.diet:
+            food_consumption = (
+                previous.animal.phase.diet.total_weight * date_difference.days
+            )
+            
         if gained_weight == 0:
             return 0
 

@@ -102,6 +102,7 @@ class DietViewSet(viewsets.ModelViewSet):
             DietSupplement.objects.filter(diet_id=diet.id).delete()
             diet_supplements = [
                 DietSupplement(
+                    user=self.request.user,
                     diet_id=diet.id,
                     supplement_id=supplement["id"],
                     quantity=supplement["quantity"],

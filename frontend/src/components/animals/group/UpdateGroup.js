@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 
 import { HiPencil } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
+import useAxios from '../../../utils/useAxios'
 
 
 const headers = { action: '', badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
 
 export default function UpdateGroup(props) {
+    const api = useAxios()
+
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
@@ -26,32 +29,20 @@ export default function UpdateGroup(props) {
         const animalList = [...animals]
         animalList[index].isChecked = event.target.checked
         setAnimals(animalList)
-        console.log(animalList)
     }
 
     useEffect(() => {
         setLoading(true)
-
-        const url = baseURL + 'animals/api/sectors/'
-        fetch(url, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-            }
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    if (response.status === 404)
-                        navigate('/404')
-                    else
-                        navigate('/500')
-                }
-                return response.json()
-            })
-            .then((data) => {
-                setSectors(data)
+        const fetchData = async () => {
+            try {
+                const sectors = await api.get(`animals/api/sectors/`)
+                setSectors(sectors.data)
                 setLoading(false)
-            })
-            .catch((e) => { console.log(e) })
+            } catch (e) {
+                toast.error('Ocurrió un error: ', e)
+            }
+        }
+        fetchData()
     }, [navigate])
 
     return (

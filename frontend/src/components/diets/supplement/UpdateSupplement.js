@@ -72,7 +72,7 @@ export default function UpdateSupplement(props) {
                         <Link onClick={handleClose} role='button' className='secondary'>Cancelar</Link>
                         <Link onClick={() => {
                             handleClose()
-                            handleUpdate({ name, description, kg })
+                            handleUpdate({ name, description, kg_presentation: kg })
                         }} role='button' >Confirmar</Link>
                     </footer>
                 </article>
