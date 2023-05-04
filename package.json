@@ -1,7 +1,7 @@
 {
   "name": "bovines",
   "version": "0.1.0",
-  "homepage": "https://javan9916.github.io/bovines-web",
+  "homepage": "https://javan9916.github.io/bovines-web/",
   "private": true,
   "dependencies": {
     "@picocss/pico": "^1.5.6",
