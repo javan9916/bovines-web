@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
+import { HashLoader } from 'react-spinners'
 
 import { HiCheck } from 'react-icons/hi'
 import useAxios from '../../../utils/useAxios'
-
+import { spinnerColor } from '../../../shared'
 
 
 export default function CreateWeight() {
@@ -37,46 +38,54 @@ export default function CreateWeight() {
         }
     })
 
-    return (
-        <main>
-            <section>
-                <h1>Nuevo pesaje</h1>
-                <form onSubmit={onSubmit}>
-                    <div className='grid'>
-                        <label htmlFor='weight'>
-                            Peso del animal
-                            <div className='measure-input'>
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <h1>Nuevo pesaje</h1>
+                    <form onSubmit={onSubmit}>
+                        <div className='grid'>
+                            <label htmlFor='weight'>
+                                Peso del animal
+                                <div className='measure-input'>
+                                    <input
+                                        id='weight'
+                                        name='weight'
+                                        type='number'
+                                        placeholder='Peso'
+                                        {...register('weight', { required: true })} />
+                                    <div className='centered-flex-container'>KG</div>
+                                </div>
+                            </label>
+    
+                            <label htmlFor='date'>
+                                Fecha del pesaje
                                 <input
-                                    id='weight'
-                                    name='weight'
-                                    type='number'
-                                    placeholder='Peso'
-                                    {...register('weight', { required: true })} />
-                                <div className='centered-flex-container'>KG</div>
-                            </div>
-                        </label>
-
-                        <label htmlFor='date'>
-                            Fecha del pesaje
-                            <input
-                                id='date'
-                                name='date'
-                                type='date'
-                                max={new Date().toISOString().split('T')[0]}
-                                {...register('date', { required: true, value: formattedDate })} />
-                        </label>
-                    </div>
-
-                    <div className='centered-flex-container'>
-                        <div className='flex-3' />
-                        <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
-                            <HiCheck />
-                            &nbsp;
-                            <p>Completar</p>
-                        </button>
-                    </div>
-                </form>
-            </section>
-        </main>
-    )
+                                    id='date'
+                                    name='date'
+                                    type='date'
+                                    max={new Date().toISOString().split('T')[0]}
+                                    {...register('date', { required: true, value: formattedDate })} />
+                            </label>
+                        </div>
+    
+                        <div className='centered-flex-container'>
+                            <div className='flex-3' />
+                            <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
+                                <HiCheck />
+                                &nbsp;
+                                <p>Completar</p>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </main>
+        )
+    }
 }

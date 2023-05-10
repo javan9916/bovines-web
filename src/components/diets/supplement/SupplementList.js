@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { HashLoader } from 'react-spinners'
 
 import Pagination from '../../Pagination'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 const headers = { name: 'Nombre', kg_presentation: 'Presentación' }
@@ -47,64 +49,64 @@ export default function SupplementList() {
         fetchData()
     }, [navigate, order, currentPage, offset])
 
-    return (
-        <main className='container'>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Suplementos
-                    </h1>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Suplementos
+                        </h1>
+                    </div>
+                    <div>
+                        {supplements && supplements.length ?
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(headers).map((key) =>
+                                                <th key={key}
+                                                    onClick={() => { handleOrdering(String(key)) }}>
+                                                    {headers[key]}
+                                                </th>
+                                            )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {supplements.map((supplement, key) =>
+                                            <tr key={key}>
+                                                <td>{supplement.name}</td>
+                                                <td>{supplement.kg_presentation} KG</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                            :
+                            <h4 className='centered-flex-container'>No hay dietas en la base de datos</h4>
+                        }
+                    </div>
+                    {response ?
+                        <div className='flex-centered-container'>
+                            <Pagination
+                                className='pagination-bar'
+                                currentPage={currentPage}
+                                totalCount={response.count}
+                                pageSize={pageSize}
+                                onPageChange={handlePageChange}
+                            />
                         </div>
                         :
-                        <>
-                            {supplements && supplements.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(headers).map((key) =>
-                                                    <th key={key}
-                                                        onClick={() => { handleOrdering(String(key)) }}>
-                                                        {headers[key]}
-                                                    </th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {supplements.map((supplement, key) =>
-                                                <tr key={key}>
-                                                    <td>{supplement.name}</td>
-                                                    <td>{supplement.kg_presentation} KG</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay dietas en la base de datos</h4>
-                            }
-                        </>
+                        null
                     }
-                </div>
-                {response ?
-                    <div className='flex-centered-container'>
-                        <Pagination
-                            className='pagination-bar'
-                            currentPage={currentPage}
-                            totalCount={response.count}
-                            pageSize={pageSize}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
-                    :
-                    null
-                }
-            </section>
-        </main >
-    )
+                </section>
+            </main>
+        )
+    }
 }

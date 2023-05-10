@@ -24,45 +24,44 @@ export default function Header(props) {
 
     return (
         <>
-            <nav className={user ? 'container-fluid nav' : 'container-fluid nav none'} id='nav'>
-                <ul>
-                    <li key='nav'>
-                        <button className='nav-icon' onClick={displayMenu}>
-                            <HiMenu />
-                        </button>
-                    </li>
-                    {navigation.map((item) => {
-                        return (
-                            <li key={item.name}>
-                                <NavLink
-                                    to={item.href}
-                                    className={({ isActive }) => {
-                                        return isActive ? 'nav-selected' : null
-                                    }}>
-                                    {item.name}
-                                </NavLink>
+            {user ?
+                <div className='header'>
+                    <nav className='container-fluid nav' id='nav'>
+                        <ul>
+                            <li key='nav'>
+                                <button className='nav-icon' onClick={displayMenu}>
+                                    <HiMenu />
+                                </button>
                             </li>
-                        )
-                    })}
+                            {navigation.map((item) => {
+                                return (
+                                    <li key={item.name}>
+                                        <NavLink
+                                            to={item.href}
+                                            className={({ isActive }) => {
+                                                return isActive ? 'nav-selected' : null
+                                            }}>
+                                            {item.name}
+                                        </NavLink>
+                                    </li>
+                                )
+                            })}
 
-                    <li key='logout'>
-                        {user ?
-                            <NavLink
-                                to={'/login'}
-                                onClick={logoutUser}> Cerrar sesión </NavLink>
-                            :
-                            <NavLink to={'/login'}> Iniciar sesión </NavLink>
-                        }
-                    </li>
-                </ul>
-                <ul>
-                    <li><strong>Bovinos</strong></li>
-                </ul>
-            </nav>
-            <hr className='separator' />
-            <div className='container'>
-                {props.children}
-            </div>
+                            <li key='logout'>
+                                <NavLink
+                                    to={'/login'}
+                                    onClick={logoutUser}> Cerrar sesión </NavLink>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li><strong>Bovinos</strong></li>
+                        </ul>
+                    </nav>
+                </div>
+                :
+                null
+            }
+            {props.children}
         </>
     )
 }

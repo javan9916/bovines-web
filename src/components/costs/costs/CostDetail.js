@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { HashLoader } from 'react-spinners'
 
 import DeleteModal from '../../DeleteModal'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 export default function CostDetail() {
@@ -44,8 +46,8 @@ export default function CostDetail() {
 
     if (loading) {
         return (
-            <div className='centered-flex-container'>
-                <div className='loader' />
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
             </div>
         )
     } else {

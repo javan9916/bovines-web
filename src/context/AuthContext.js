@@ -1,8 +1,10 @@
 import { createContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { HashLoader } from 'react-spinners'
 import jwt_decode from 'jwt-decode'
 import { baseURL } from '../shared'
 import { toast } from 'react-hot-toast'
+import { spinnerColor } from '../shared'
 
 
 const AuthContext = createContext()
@@ -43,7 +45,11 @@ export const AuthProvider = ({ children }) => {
             setUser(jwt_decode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
             navigate('/')
-        } else toast.error('Algo salió mal')
+        } else if (response.status === 401) {
+            toast.error('No hay ningún usuario con esas credenciales')
+        } else {
+            toast.error('Algo salió mal, intente de nuevo...')
+        }
     }
 
     const registerUser = async (username, first_name, last_name, email, password, password2) => {
@@ -93,8 +99,8 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={contextData}>
             {loading ?
-                <div className='centered-flex-container'>
-                    <div className='loader' />
+                <div className='loader-container'>
+                    <HashLoader color={spinnerColor} loading={loading} />
                 </div>
                 :
                 children

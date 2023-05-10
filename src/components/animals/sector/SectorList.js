@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { HashLoader } from 'react-spinners'
 
 import Pagination from '../../Pagination'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 const headers = { name: 'Nombre', area: 'Área' }
@@ -47,68 +49,71 @@ export default function SectorList() {
         fetchData()
     }, [navigate, order, currentPage, offset])
 
-    return (
-        <main className='container'>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Sectores
-                    </h1>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Sectores
+                        </h1>
+                    </div>
+                    <div>
+
+                        {sectors && sectors.length ?
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(headers).map((key) =>
+                                                <th key={key}
+                                                    onClick={() => { handleOrdering(String(key)) }}>
+                                                    {headers[key]}
+                                                </th>
+                                            )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {sectors.map((sector, key) =>
+                                            <tr
+                                                key={key}
+                                                onClick={() => {
+                                                    navigate(`/animales/sectores/${sector.id}`)
+                                                }}>
+                                                <td>{sector.name}</td>
+                                                <td>{sector.area}</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                            :
+                            <h4 className='centered-flex-container'>No hay sectores en la base de datos</h4>
+                        }
+                    </div>
+                    {response ?
+                        <div className='flex-centered-container'>
+                            <Pagination
+                                className='pagination-bar'
+                                currentPage={currentPage}
+                                totalCount={response.count}
+                                pageSize={pageSize}
+                                onPageChange={handlePageChange}
+                            />
                         </div>
                         :
-                        <>
-                            {sectors && sectors.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(headers).map((key) =>
-                                                    <th key={key}
-                                                        onClick={() => { handleOrdering(String(key)) }}>
-                                                        {headers[key]}
-                                                    </th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {sectors.map((sector, key) =>
-                                                <tr
-                                                    key={key}
-                                                    onClick={() => {
-                                                        navigate(`/animales/sectores/${sector.id}`)
-                                                    }}>
-                                                    <td>{sector.name}</td>
-                                                    <td>{sector.area}</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay sectores en la base de datos</h4>
-                            }
-                        </>
+                        null
                     }
-                </div>
-                {response ?
-                    <div className='flex-centered-container'>
-                        <Pagination
-                            className='pagination-bar'
-                            currentPage={currentPage}
-                            totalCount={response.count}
-                            pageSize={pageSize}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
-                    :
-                    null
-                }
-            </section>
-        </main >
-    )
+                </section>
+            </main>
+        )
+    }
+
+
 }

@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-
 import { HiCheck } from 'react-icons/hi'
+import { HashLoader } from 'react-spinners'
+
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 export default function CreateSector() {
@@ -27,43 +29,51 @@ export default function CreateSector() {
         }
     })
 
-    return (
-        <main>
-            <section>
-                <h1> Nuevo sector </h1>
-                <form onSubmit={onSubmit}>
-                    <div className='grid'>
-                        <label htmlFor='name'>
-                            Nombre
-                            <input
-                                id='name'
-                                name='name'
-                                type='text'
-                                placeholder='Nombre del sector'
-                                {...register('name', { required: true })} />
-                        </label>
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <h1> Nuevo sector </h1>
+                    <form onSubmit={onSubmit}>
+                        <div className='grid'>
+                            <label htmlFor='name'>
+                                Nombre
+                                <input
+                                    id='name'
+                                    name='name'
+                                    type='text'
+                                    placeholder='Nombre del sector'
+                                    {...register('name', { required: true })} />
+                            </label>
 
-                        <label htmlFor='area'>
-                            Área
-                            <input
-                                id='area'
-                                name='area'
-                                type='number'
-                                placeholder='Área del terreno'
-                                {...register('area', { required: true })} />
-                        </label>
-                    </div>
+                            <label htmlFor='area'>
+                                Área
+                                <input
+                                    id='area'
+                                    name='area'
+                                    type='number'
+                                    placeholder='Área del terreno'
+                                    {...register('area', { required: true })} />
+                            </label>
+                        </div>
 
-                    <div className='centered-flex-container'>
-                        <div className='flex-3' />
-                        <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
-                            <HiCheck />
-                            &nbsp;
-                            <p>Completar</p>
-                        </button>
-                    </div>
-                </form>
-            </section>
-        </main>
-    )
+                        <div className='centered-flex-container'>
+                            <div className='flex-3' />
+                            <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
+                                <HiCheck />
+                                &nbsp;
+                                <p>Completar</p>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </main>
+        )
+    }
 }

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { HashLoader } from 'react-spinners'
 
 import Pagination from '../../Pagination'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 const headers = { id: 'ID', name: 'Nombre' }
@@ -47,69 +49,76 @@ export default function CategoryList() {
         fetchData()
     }, [navigate, order, currentPage, offset])
 
-
-    return (
-        <main className='container'>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Categorías
-                    </h1>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Categorías
+                        </h1>
+                    </div>
+                    <div>
+                        {loading ?
+                            <div className='centered-flex-container'>
+                                <div className='loader' />
+                            </div>
+                            :
+                            <>
+                                {categories && categories.length ?
+                                    <div>
+                                        <table>
+                                            <thead>
+                                                <tr key='headers'>
+                                                    {Object.keys(headers).map((key) =>
+                                                        <th key={key}
+                                                            onClick={() => { handleOrdering(String(key)) }}>
+                                                            {headers[key]}
+                                                        </th>
+                                                    )}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {categories.map((category, key) =>
+                                                    <tr
+                                                        key={key}
+                                                        onClick={() => {
+                                                            navigate(`/costos/categorias/${category.id}`)
+                                                        }}>
+                                                        <td>{category.id}</td>
+                                                        <td>{category.name}</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    :
+                                    <h4 className='centered-flex-container'>No hay categorías en la base de datos</h4>
+                                }
+                            </>
+                        }
+                    </div>
+                    {response ?
+                        <div className='flex-centered-container'>
+                            <Pagination
+                                className='pagination-bar'
+                                currentPage={currentPage}
+                                totalCount={response.count}
+                                pageSize={pageSize}
+                                onPageChange={handlePageChange}
+                            />
                         </div>
                         :
-                        <>
-                            {categories && categories.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(headers).map((key) =>
-                                                    <th key={key}
-                                                        onClick={() => { handleOrdering(String(key)) }}>
-                                                        {headers[key]}
-                                                    </th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {categories.map((category, key) =>
-                                                <tr
-                                                    key={key}
-                                                    onClick={() => {
-                                                        navigate(`/costos/categorias/${category.id}`)
-                                                    }}>
-                                                    <td>{category.id}</td>
-                                                    <td>{category.name}</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay categorías en la base de datos</h4>
-                            }
-                        </>
+                        null
                     }
-                </div>
-                {response ?
-                    <div className='flex-centered-container'>
-                        <Pagination
-                            className='pagination-bar'
-                            currentPage={currentPage}
-                            totalCount={response.count}
-                            pageSize={pageSize}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
-                    :
-                    null
-                }
-            </section>
-        </main >
-    )
+                </section>
+            </main >
+        )
+    }
 }

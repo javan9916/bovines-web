@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import { HashLoader } from 'react-spinners'
 import { HiPlus } from 'react-icons/hi'
 import { toast } from 'react-hot-toast'
+
 import useAxios from '../utils/useAxios'
+import { spinnerColor } from '../shared'
 
 
 const costHeaders = { name: 'Nombre', type: 'Tipo', cost: 'Costo' }
@@ -30,7 +32,7 @@ export default function Costs() {
 
                 setCostLength(costs.data.length)
                 setCategoriesLength(categories.data.length)
-                
+
                 let costsList = costs.data
                 if (costs.data.length > 5)
                     costsList = costs.data.slice(0, 5);
@@ -40,7 +42,7 @@ export default function Costs() {
                 if (categories.data.length > 5)
                     categoriesList = categories.data.slice(0, 5);
                 setCategories(categoriesList)
-                
+
                 setLoading(false)
             } catch (e) {
                 toast.error('Ocurrió un error: ', e)
@@ -49,129 +51,121 @@ export default function Costs() {
         fetchData()
     }, [])
 
-    return (
-        <main className='container'>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Costos
-                    </h1>
-                    <button
-                        onClick={() => navigate('agregar_costo')}
-                        className='fit flex-1 navlink-button flex-container no-decoration'>
-                        <HiPlus />
-                        &nbsp;
-                        <p>Nuevo costo</p>
-                    </button>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
-                        </div>
-                        :
-                        <>
-                            {costs && costs.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(costHeaders).map((key) =>
-                                                    <th key={key}>{costHeaders[key]}</th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {costs.map((cost, key) =>
-                                                <tr
-                                                    key={key}
-                                                    onClick={() => {
-                                                        navigate(`/costos/${cost.id}`)
-                                                    }}>
-                                                    <td>{cost.name}</td>
-                                                    {cost.type === 'i' ? <td>Inversión</td> : <td>Gasto</td>}
-                                                    <td>{cost.cost}</td>
-                                                </tr>
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Costos
+                        </h1>
+                        <button
+                            onClick={() => navigate('agregar_costo')}
+                            className='fit flex-1 navlink-button flex-container no-decoration'>
+                            <HiPlus />
+                            &nbsp;
+                            <p>Nuevo costo</p>
+                        </button>
+                    </div>
+                    <div>
+                        {costs && costs.length ?
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(costHeaders).map((key) =>
+                                                <th key={key}>{costHeaders[key]}</th>
                                             )}
-                                        </tbody>
-                                    </table>
-                                    {costLength > 5 ?
-                                        <div className='centered-flex-container'>
-                                            <button onClick={() => navigate('lista')} className='fit '>
-                                                Ver toda la lista
-                                            </button>
-                                        </div>
-                                        :
-                                        null
-                                    }
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay animales en la base de datos</h4>
-                            }
-                        </>
-                    }
-                </div>
-            </section>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Categorías
-                    </h1>
-                    <button
-                        onClick={() => navigate('agregar_categoria')}
-                        className='fit flex-1 navlink-button flex-container no-decoration'>
-                        <HiPlus />
-                        &nbsp;
-                        <p>Nueva categoría</p>
-                    </button>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
-                        </div>
-                        :
-                        <>
-                            {categories && categories.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(categoryHeaders).map((key) =>
-                                                    <th key={key}>{categoryHeaders[key]}</th>
-                                                )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {costs.map((cost, key) =>
+                                            <tr
+                                                key={key}
+                                                onClick={() => {
+                                                    navigate(`/costos/${cost.id}`)
+                                                }}>
+                                                <td>{cost.name}</td>
+                                                {cost.type === 'i' ? <td>Inversión</td> : <td>Gasto</td>}
+                                                <td>{cost.cost}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {categories.map((category, key) =>
-                                                <tr
-                                                    key={key}
-                                                    onClick={() => {
-                                                        navigate(`/costos/categorias/${category.id}`)
-                                                    }}>
-                                                    <td>{category.id}</td>
-                                                    <td>{category.name}</td>
-                                                </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                {costLength > 5 ?
+                                    <div className='centered-flex-container'>
+                                        <button onClick={() => navigate('lista')} className='fit '>
+                                            Ver toda la lista
+                                        </button>
+                                    </div>
+                                    :
+                                    null
+                                }
+                            </div>
+                            :
+                            <h4 className='centered-flex-container'>No hay animales en la base de datos</h4>
+                        }
+                    </div>
+                </section>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Categorías
+                        </h1>
+                        <button
+                            onClick={() => navigate('agregar_categoria')}
+                            className='fit flex-1 navlink-button flex-container no-decoration'>
+                            <HiPlus />
+                            &nbsp;
+                            <p>Nueva categoría</p>
+                        </button>
+                    </div>
+                    <div>
+                        {categories && categories.length ?
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(categoryHeaders).map((key) =>
+                                                <th key={key}>{categoryHeaders[key]}</th>
                                             )}
-                                        </tbody>
-                                    </table>
-                                    {categoriesLength > 5 ?
-                                        <div className='centered-flex-container'>
-                                            <button onClick={() => navigate('categorias/lista')} className='fit '>
-                                                Ver toda la lista
-                                            </button>
-                                        </div>
-                                        :
-                                        null
-                                    }
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay animales en la base de datos</h4>
-                            }
-                        </>
-                    }
-                </div>
-            </section>
-        </main>
-    )
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {categories.map((category, key) =>
+                                            <tr
+                                                key={key}
+                                                onClick={() => {
+                                                    navigate(`/costos/categorias/${category.id}`)
+                                                }}>
+                                                <td>{category.id}</td>
+                                                <td>{category.name}</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                {categoriesLength > 5 ?
+                                    <div className='centered-flex-container'>
+                                        <button onClick={() => navigate('categorias/lista')} className='fit '>
+                                            Ver toda la lista
+                                        </button>
+                                    </div>
+                                    :
+                                    null
+                                }
+                            </div>
+                            :
+                            <h4 className='centered-flex-container'>No hay animales en la base de datos</h4>
+                        }
+                    </div>
+                </section>
+            </main>
+        )
+    }
 }

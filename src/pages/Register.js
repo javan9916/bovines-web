@@ -20,7 +20,7 @@ export default function Register() {
     }
 
     return (
-        <main>
+        <main className='container'>
             <section>
                 <h1> Nuevo usuario </h1>
                 <form onSubmit={handleSubmit}>

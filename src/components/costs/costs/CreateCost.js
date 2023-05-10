@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-
 import { HiCheck } from 'react-icons/hi'
+import { HashLoader } from 'react-spinners'
+
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 export default function CreateCost() {
@@ -49,80 +51,87 @@ export default function CreateCost() {
         fetchData()
     }, [navigate])
 
-    return (
-        <main>
-            <section>
-                <h1> Nuevo costo </h1>
-                <form onSubmit={onSubmit}>
-                    <div className='grid'>
-                        <label htmlFor='name'>
-                            Nombre
-                            <input
-                                id='name'
-                                name='name'
-                                type='text'
-                                placeholder='Nombre del costo'
-                                {...register('name', { required: true })} />
-                        </label>
-
-                        <label htmlFor='date'>
-                            Fecha del costo
-                            <input
-                                id='date'
-                                name='date'
-                                type='date'
-                                {...register('date', { required: true, value: formattedDate })} />
-                        </label>
-
-                        <label htmlFor='cost'>
-                            Total
-                            <input
-                                id='cost'
-                                name='cost'
-                                type='number'
-                                placeholder='Total del costo'
-                                {...register('cost', { required: true })} />
-                        </label>
-                    </div>
-
-                    <div className='grid'>
-                        <label htmlFor='category'>
-                            Categoría
-                            <select
-                                id='category'
-                                name='category'
-                                {...register('category', { required: true })}>
-                                <option value='' disabled>Seleccionar</option>
-                                {categories.map((category, key) =>
-                                    <option key={key} value={category.id}>{category.name}</option>
-                                )}
-                            </select>
-                        </label>
-
-                        <label htmlFor='type'>
-                            Tipo de costo
-                            <select
-                                id='type'
-                                name='type'
-                                {...register('type', { required: true })}>
-                                <option value='' disabled>Seleccionar</option>
-                                <option value='I'>Inversión</option>
-                                <option value='G'>Gasto</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div className='centered-flex-container'>
-                        <div className='flex-3' />
-                        <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
-                            <HiCheck />
-                            &nbsp;
-                            <p>Completar</p>
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-        </main>
-    )
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main>
+                <section>
+                    <h1> Nuevo costo </h1>
+                    <form onSubmit={onSubmit}>
+                        <div className='grid'>
+                            <label htmlFor='name'>
+                                Nombre
+                                <input
+                                    id='name'
+                                    name='name'
+                                    type='text'
+                                    placeholder='Nombre del costo'
+                                    {...register('name', { required: true })} />
+                            </label>
+    
+                            <label htmlFor='date'>
+                                Fecha del costo
+                                <input
+                                    id='date'
+                                    name='date'
+                                    type='date'
+                                    {...register('date', { required: true, value: formattedDate })} />
+                            </label>
+    
+                            <label htmlFor='cost'>
+                                Total
+                                <input
+                                    id='cost'
+                                    name='cost'
+                                    type='number'
+                                    placeholder='Total del costo'
+                                    {...register('cost', { required: true })} />
+                            </label>
+                        </div>
+    
+                        <div className='grid'>
+                            <label htmlFor='category'>
+                                Categoría
+                                <select
+                                    id='category'
+                                    name='category'
+                                    {...register('category', { required: true })}>
+                                    <option value='' disabled>Seleccionar</option>
+                                    {categories.map((category, key) =>
+                                        <option key={key} value={category.id}>{category.name}</option>
+                                    )}
+                                </select>
+                            </label>
+    
+                            <label htmlFor='type'>
+                                Tipo de costo
+                                <select
+                                    id='type'
+                                    name='type'
+                                    {...register('type', { required: true })}>
+                                    <option value='' disabled>Seleccionar</option>
+                                    <option value='I'>Inversión</option>
+                                    <option value='G'>Gasto</option>
+                                </select>
+                            </label>
+                        </div>
+    
+                        <div className='centered-flex-container'>
+                            <div className='flex-3' />
+                            <button aria-busy={loading} type='submit' className='flex-1 navlink-button flex-container no-decoration'>
+                                <HiCheck />
+                                &nbsp;
+                                <p>Completar</p>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </main>
+        )
+    }
 }

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { HashLoader } from 'react-spinners'
 
 import DeleteModal from '../../DeleteModal'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
+
 
 export default function CategoryDetail() {
     const api = useAxios()
@@ -43,8 +46,8 @@ export default function CategoryDetail() {
 
     if (loading) {
         return (
-            <div className='centered-flex-container'>
-                <div className='loader' />
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
             </div>
         )
     } else {

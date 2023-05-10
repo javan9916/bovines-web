@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-
 import { HiPlus } from 'react-icons/hi'
+import { HashLoader } from 'react-spinners'
+
 import DeleteModal from '../../DeleteModal'
 import UpdateAnimal from './UpdateAnimal'
-
 import humanizeDuration from 'humanize-duration'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 const headers = { weight: 'Peso', date: 'Fecha de registro', gpd: 'GPD', gpt: 'GPT', fca: 'FCA' }
@@ -78,8 +79,8 @@ export default function AnimalDetail() {
 
     if (loading) {
         return (
-            <div className='centered-flex-container'>
-                <div className='loader' />
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
             </div>
         )
     } else {

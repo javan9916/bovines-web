@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { HashLoader } from 'react-spinners'
 
-import { baseURL } from '../../../shared'
 import DeleteModal from '../../DeleteModal'
 import UpdateGroup from './UpdateGroup'
 import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 const headers = { badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
@@ -68,8 +69,8 @@ export default function GroupDetail() {
 
     if (loading) {
         return (
-            <div className='centered-flex-container'>
-                <div className='loader' />
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
             </div>
         )
     } else {

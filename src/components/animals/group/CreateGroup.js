@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-
-import { HiCheck } from 'react-icons/hi'
-import { baseURL } from '../../../shared'
-import useAxios from '../../../utils/useAxios'
+import { HashLoader } from 'react-spinners'
 import { useForm } from 'react-hook-form'
+import { HiCheck } from 'react-icons/hi'
+
+import useAxios from '../../../utils/useAxios'
+import { spinnerColor } from '../../../shared'
 
 
 const headers = { action: '', badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
@@ -58,91 +59,90 @@ export default function CreateGroup() {
         fetchData()
     }, [navigate])
 
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <h1>Nuevo grupo de animales</h1>
+                    <form onSubmit={onSubmit}>
+                        <div className='grid'>
+                            <label htmlFor='name'>
+                                Nombre del grupo
+                                <input
+                                    id='name'
+                                    name='name'
+                                    type='text'
+                                    placeholder='Nombre del grupo'
+                                    {...register('name', { required: true })} />
+                            </label>
+                            <label htmlFor='sector'>
+                                Sector
+                                <select
+                                    id='sector'
+                                    name='sector'
+                                    {...register('sector', { required: true })}>
+                                    <option value='' disabled>Seleccionar</option>
+                                    {sectors.map((sector, key) =>
+                                        <option key={key} value={sector.id}>{sector.name}</option>
+                                    )}
+                                </select>
+                            </label>
+                        </div>
+                        <div>
 
-    return (
-        <main>
-            <section>
-                <h1>Nuevo grupo de animales</h1>
-                <form onSubmit={onSubmit}>
-                    <div className='grid'>
-                        <label htmlFor='name'>
-                            Nombre del grupo
-                            <input
-                                id='name'
-                                name='name'
-                                type='text'
-                                placeholder='Nombre del grupo'
-                                {...register('name', { required: true })} />
-                        </label>
-                        <label htmlFor='sector'>
-                            Sector
-                            <select
-                                id='sector'
-                                name='sector'
-                                {...register('sector', { required: true })}>
-                                <option value='' disabled>Seleccionar</option>
-                                {sectors.map((sector, key) =>
-                                    <option key={key} value={sector.id}>{sector.name}</option>
-                                )}
-                            </select>
-                        </label>
-                    </div>
-                    <div>
-                        {loading ?
-                            <div className='centered-flex-container'>
-                                <div className='loader' />
-                            </div>
-                            :
-                            <>
-                                {animals && animals.length ?
-                                    <div>
-                                        <table>
-                                            <thead>
-                                                <tr key='headers'>
-                                                    {Object.keys(headers).map((key) =>
-                                                        <th key={key}>{headers[key]}</th>
-                                                    )}
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {animals.map((animal, index) =>
-                                                    <tr
-                                                        key={index}>
-                                                        <td>
-                                                            <input
-                                                                type='checkbox'
-                                                                onChange={(e) => { setChecked(e, index) }}
-                                                                id='animal_check'
-                                                                name='animal_check'
-                                                                value={animal.id} />
-                                                        </td>
-                                                        <td>{animal.badge_number}</td>
-                                                        {animal.origin === 'S' ? <td>Subasta</td> : <td>Finca</td>}
-                                                        <td>{animal.sex}</td>
-                                                        <td>{animal.breed}</td>
-                                                    </tr>
-
+                            {animals && animals.length ?
+                                <div>
+                                    <table>
+                                        <thead>
+                                            <tr key='headers'>
+                                                {Object.keys(headers).map((key) =>
+                                                    <th key={key}>{headers[key]}</th>
                                                 )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    :
-                                    <h4 className='centered-flex-container'>No hay animales sin grupo</h4>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {animals.map((animal, index) =>
+                                                <tr
+                                                    key={index}>
+                                                    <td>
+                                                        <input
+                                                            type='checkbox'
+                                                            onChange={(e) => { setChecked(e, index) }}
+                                                            id='animal_check'
+                                                            name='animal_check'
+                                                            value={animal.id} />
+                                                    </td>
+                                                    <td>{animal.badge_number}</td>
+                                                    {animal.origin === 'S' ? <td>Subasta</td> : <td>Finca</td>}
+                                                    <td>{animal.sex}</td>
+                                                    <td>{animal.breed}</td>
+                                                </tr>
 
-                                }
-                            </>
-                        }
-                    </div>
-                    <div className='centered-flex-container'>
-                        <div className='flex-3' />
-                        <button className='flex-1 navlink-button flex-container no-decoration'>
-                            <HiCheck />
-                            &nbsp;
-                            <p>Completar</p>
-                        </button>
-                    </div>
-                </form>
-            </section>
-        </main>
-    )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                :
+                                <h4 className='centered-flex-container'>No hay animales sin grupo</h4>
+                            }
+                        </div>
+                        <div className='centered-flex-container'>
+                            <div className='flex-3' />
+                            <button className='flex-1 navlink-button flex-container no-decoration'>
+                                <HiCheck />
+                                &nbsp;
+                                <p>Completar</p>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </main>
+        )
+    }
 }

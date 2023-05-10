@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { HashLoader } from 'react-spinners'
 import { toast } from 'react-hot-toast'
-
 import { HiPlus } from 'react-icons/hi'
+
 import useAxios from '../utils/useAxios'
+import { spinnerColor } from '../shared'
 
 
 const dietHeaders = { name: 'Nombre', cost: 'Costo total' }
@@ -82,191 +84,182 @@ export default function Diets() {
         fetchData()
     }, [endingPhase, gainingPhase, devPhase])
 
-    return (
-        <main className='container'>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Dietas
-                    </h1>
-                    <button
-                        onClick={() => navigate('agregar_dieta')}
-                        className='fit flex-1 navlink-button flex-container no-decoration'>
-                        <HiPlus />
-                        &nbsp;
-                        <p>Nueva dieta</p>
-                    </button>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
-                        </div>
-                        :
-                        <>
-                            {diets && diets.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(dietHeaders).map((key) =>
-                                                    <th key={key}>{dietHeaders[key]}</th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {diets.map((diet, key) =>
-                                                <tr
-                                                    key={key}
-                                                    onClick={() => {
-                                                        navigate(`/dietas/${diet.id}`)
-                                                    }}>
-                                                    <td>{diet.name}</td>
-                                                    <td>{diet.total_cost} colones</td>
-                                                </tr>
+    if (loading) {
+        return (
+            <div className='loader-container'>
+                <HashLoader color={spinnerColor} loading={loading} />
+            </div>
+        )
+    } else {
+        return (
+            <main className='container'>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Dietas
+                        </h1>
+                        <button
+                            onClick={() => navigate('agregar_dieta')}
+                            className='fit flex-1 navlink-button flex-container no-decoration'>
+                            <HiPlus />
+                            &nbsp;
+                            <p>Nueva dieta</p>
+                        </button>
+                    </div>
+                    <div>
+
+                        {diets && diets.length ?
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(dietHeaders).map((key) =>
+                                                <th key={key}>{dietHeaders[key]}</th>
                                             )}
-                                        </tbody>
-                                    </table>
-                                    {dietLenght > 5 ?
-                                        <div className='centered-flex-container'>
-                                            <button onClick={() => navigate('lista')} className='fit '>
-                                                Ver toda la lista
-                                            </button>
-                                        </div>
-                                        :
-                                        null
-                                    }
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay dietas en la base de datos</h4>
-                            }
-                        </>
-                    }
-                </div>
-            </section>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Inventario
-                    </h1>
-                    <button
-                        onClick={() => navigate('suplementos/agregar_suplemento')}
-                        className='fit flex-1 navlink-button flex-container no-decoration'>
-                        <HiPlus />
-                        &nbsp;
-                        <p>Nuevo suplemento</p>
-                    </button>
-                </div>
-                <div>
-                    {loading ?
-                        <div className='centered-flex-container'>
-                            <div className='loader' />
-                        </div>
-                        :
-                        <>
-                            {supplements && supplements.length ?
-                                <div>
-                                    <table>
-                                        <thead>
-                                            <tr key='headers'>
-                                                {Object.keys(supplementHeaders).map((key) =>
-                                                    <th key={key}>{supplementHeaders[key]}</th>
-                                                )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {diets.map((diet, key) =>
+                                            <tr
+                                                key={key}
+                                                onClick={() => {
+                                                    navigate(`/dietas/${diet.id}`)
+                                                }}>
+                                                <td>{diet.name}</td>
+                                                <td>{diet.total_cost} colones</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {supplements.map((supplement, key) =>
-                                                <tr
-                                                    key={key}
-                                                    onClick={() => {
-                                                        navigate(`suplementos/${supplement.id}`)
-                                                    }}>
-                                                    <td>{supplement.name}</td>
-                                                    <td>{supplement.prices[0].price}</td>
-                                                    <td>{supplement.kg_presentation} KG</td>
+                                        )}
+                                    </tbody>
+                                </table>
+                                {dietLenght > 5 ?
+                                    <div className='centered-flex-container'>
+                                        <button onClick={() => navigate('lista')} className='fit '>
+                                            Ver toda la lista
+                                        </button>
+                                    </div>
+                                    :
+                                    null
+                                }
+                            </div>
+                            :
+                            <h4 className='centered-flex-container'>No hay dietas en la base de datos</h4>
+                        }
+                    </div>
+                </section>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Inventario
+                        </h1>
+                        <button
+                            onClick={() => navigate('suplementos/agregar_suplemento')}
+                            className='fit flex-1 navlink-button flex-container no-decoration'>
+                            <HiPlus />
+                            &nbsp;
+                            <p>Nuevo suplemento</p>
+                        </button>
+                    </div>
+                    <div>
 
-                                                </tr>
+                        {supplements && supplements.length ?
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr key='headers'>
+                                            {Object.keys(supplementHeaders).map((key) =>
+                                                <th key={key}>{supplementHeaders[key]}</th>
                                             )}
-                                        </tbody>
-                                    </table>
-                                    {supplementLenght > 5 ?
-                                        <div className='centered-flex-container'>
-                                            <button onClick={() => navigate('lista')} className='fit '>
-                                                Ver toda la lista
-                                            </button>
-                                        </div>
-                                        :
-                                        null
-                                    }
-                                </div>
-                                :
-                                <h4 className='centered-flex-container'>No hay suplementos en la base de datos</h4>
-                            }
-                        </>
-                    }
-                </div>
-            </section>
-            <section>
-                <div className='centered-flex-container'>
-                    <h1 className='flex-3 fit'>
-                        Etapas
-                    </h1>
-                </div>
-                <div>
-                    {phases && phases.length === 3 ?
-                        <form>
-                            <label htmlFor={phases[0].name}>
-                                {phases[0].name}
-                                <select
-                                    id={phases[0].id}
-                                    name={phases[0].name}
-                                    value={devPhase}
-                                    onChange={ e => handleUpdate(e.target.value, 'dev', phases[0].id) }
-                                    required>
-                                    <option value=''>Seleccionar</option>
-                                    {diets.map((diet, key) =>
-                                        <option key={key} value={diet.id}>{diet.name}</option>
-                                    )}
-                                </select>
-                            </label>
-                            <label htmlFor={phases[1].name}>
-                                {phases[1].name}
-                                <select
-                                    id={phases[1].id}
-                                    name={phases[1].name}
-                                    value={gainingPhase}
-                                    onChange={e => handleUpdate(e.target.value, 'gain', phases[1].id) }
-                                    required>
-                                    <option value=''>Seleccionar</option>
-                                    {diets.map((diet, key) =>
-                                        <option key={key} value={diet.id}>{diet.name}</option>
-                                    )}
-                                </select>
-                            </label>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {supplements.map((supplement, key) =>
+                                            <tr
+                                                key={key}
+                                                onClick={() => {
+                                                    navigate(`suplementos/${supplement.id}`)
+                                                }}>
+                                                <td>{supplement.name}</td>
+                                                <td>{supplement.prices[0].price}</td>
+                                                <td>{supplement.kg_presentation} KG</td>
 
-                            <label htmlFor={phases[2].name}>
-                                {phases[2].name}
-                                <select
-                                    id={phases[2].id}
-                                    name={phases[2].name}
-                                    value={endingPhase}
-                                    onChange={e => handleUpdate(e.target.value, 'end', phases[2].id) }
-                                    required>
-                                    <option value=''>Seleccionar</option>
-                                    {diets.map((diet, key) =>
-                                        <option key={key} value={diet.id}>{diet.name}</option>
-                                    )}
-                                </select>
-                            </label>
-                        </form>
-                        :
-                        <h4 className='centered-flex-container'>Hay etapas faltantes en la base de datos</h4>
-                    }
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                {supplementLenght > 5 ?
+                                    <div className='centered-flex-container'>
+                                        <button onClick={() => navigate('lista')} className='fit '>
+                                            Ver toda la lista
+                                        </button>
+                                    </div>
+                                    :
+                                    null
+                                }
+                            </div>
+                            :
+                            <h4 className='centered-flex-container'>No hay suplementos en la base de datos</h4>
+                        }
+                    </div>
+                </section>
+                <section>
+                    <div className='centered-flex-container'>
+                        <h1 className='flex-3 fit'>
+                            Etapas
+                        </h1>
+                    </div>
+                    <div>
+                        {phases && phases.length === 3 ?
+                            <form>
+                                <label htmlFor={phases[0].name}>
+                                    {phases[0].name}
+                                    <select
+                                        id={phases[0].id}
+                                        name={phases[0].name}
+                                        value={devPhase}
+                                        onChange={e => handleUpdate(e.target.value, 'dev', phases[0].id)}
+                                        required>
+                                        <option value=''>Seleccionar</option>
+                                        {diets.map((diet, key) =>
+                                            <option key={key} value={diet.id}>{diet.name}</option>
+                                        )}
+                                    </select>
+                                </label>
+                                <label htmlFor={phases[1].name}>
+                                    {phases[1].name}
+                                    <select
+                                        id={phases[1].id}
+                                        name={phases[1].name}
+                                        value={gainingPhase}
+                                        onChange={e => handleUpdate(e.target.value, 'gain', phases[1].id)}
+                                        required>
+                                        <option value=''>Seleccionar</option>
+                                        {diets.map((diet, key) =>
+                                            <option key={key} value={diet.id}>{diet.name}</option>
+                                        )}
+                                    </select>
+                                </label>
 
-
-
-                </div>
-            </section>
-        </main>
-    )
+                                <label htmlFor={phases[2].name}>
+                                    {phases[2].name}
+                                    <select
+                                        id={phases[2].id}
+                                        name={phases[2].name}
+                                        value={endingPhase}
+                                        onChange={e => handleUpdate(e.target.value, 'end', phases[2].id)}
+                                        required>
+                                        <option value=''>Seleccionar</option>
+                                        {diets.map((diet, key) =>
+                                            <option key={key} value={diet.id}>{diet.name}</option>
+                                        )}
+                                    </select>
+                                </label>
+                            </form>
+                            :
+                            <h4 className='centered-flex-container'>Hay etapas faltantes en la base de datos</h4>
+                        }
+                    </div>
+                </section>
+            </main>
+        )
+    }
 }
