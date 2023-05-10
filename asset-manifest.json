@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/bovines-web/static/css/main.a9dd0a25.css",
-    "main.js": "/bovines-web/static/js/main.0a95f17d.js",
+    "main.css": "/bovines-web/static/css/main.48c6b630.css",
+    "main.js": "/bovines-web/static/js/main.3193eb39.js",
     "index.html": "/bovines-web/index.html",
-    "main.a9dd0a25.css.map": "/bovines-web/static/css/main.a9dd0a25.css.map",
-    "main.0a95f17d.js.map": "/bovines-web/static/js/main.0a95f17d.js.map"
+    "main.48c6b630.css.map": "/bovines-web/static/css/main.48c6b630.css.map",
+    "main.3193eb39.js.map": "/bovines-web/static/js/main.3193eb39.js.map"
   },
   "entrypoints": [
-    "static/css/main.a9dd0a25.css",
-    "static/js/main.0a95f17d.js"
+    "static/css/main.48c6b630.css",
+    "static/js/main.3193eb39.js"
   ]
 }
