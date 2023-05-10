@@ -37,7 +37,7 @@ export default function CreateSupplement() {
         )
     } else {
         return (
-            <main>
+            <main className='container'>
                 <section>
                     <h1> Nuevo suplemento </h1>
                     <form onSubmit={onSubmit}>

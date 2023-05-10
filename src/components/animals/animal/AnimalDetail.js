@@ -31,7 +31,7 @@ export default function AnimalDetail() {
         if (response.status === 204) {
             toast.success('Eliminado correctamente!')
             setLoading(false)
-            navigate(-1) 
+            navigate(-1)
         }
     }
 
@@ -65,6 +65,7 @@ export default function AnimalDetail() {
                 const groups = await api.get(`animals/api/groups/?animals=${id}`)
 
                 setAnimal(animal.data)
+                console.log(animal.data)
                 doDates(animal.data.weights)
 
                 if (groups.data.length)
@@ -166,7 +167,11 @@ export default function AnimalDetail() {
                             </h2>
                             {animal.weights.length ?
                                 <button
-                                    onClick={() => navigate('agregar_pesaje')}
+                                    onClick={() => animal.diets ?
+                                        navigate('agregar_pesaje')
+                                        :
+                                        toast.error('Debe asignar dietas a las etapas antes de agregar pesajes...')
+                                    }
                                     className='fit flex-1 navlink-button flex-container no-decoration'>
                                     <HiPlus />
                                     &nbsp;
@@ -180,7 +185,11 @@ export default function AnimalDetail() {
                         <div>
                             {
                                 !animal.weights.length ?
-                                    <button onClick={() => navigate('pesajes_iniciales')} className='fit'>
+                                    <button className='fit' onClick={() => animal.diets ?
+                                        navigate('pesajes_iniciales')
+                                        :
+                                        toast.error('Debe asignar dietas a las etapas antes de agregar pesajes...')
+                                    }>
                                         Agregar pesajes iniciales
                                     </button>
                                     :
