@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { HashLoader } from 'react-spinners'
 
 import DeleteModal from '../../DeleteModal'
 import UpdateSector from './UpdateSector'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function SectorDetail() {
@@ -57,11 +56,7 @@ export default function SectorDetail() {
     }, [navigate, id])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         if (sector) {
             return (

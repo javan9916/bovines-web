@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-import { HashLoader } from 'react-spinners'
 import { HiCheck } from 'react-icons/hi'
 
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function CreatePrice() {
@@ -15,7 +14,7 @@ export default function CreatePrice() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const { id } = useParams()
 
@@ -33,11 +32,7 @@ export default function CreatePrice() {
     })
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -50,6 +45,7 @@ export default function CreatePrice() {
                                 id='price'
                                 name='price'
                                 type='number'
+                                aria-invalid={errors.price ? 'true' : ''}
                                 {...register('price', { required: true })} />
                         </label>
 

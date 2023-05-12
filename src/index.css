@@ -1,6 +1,5 @@
 .container {
-    padding-top: 8vh;
-    height: 100vh;
+    padding-top: 7vh;
 }
 
 .separator {
@@ -61,29 +60,62 @@ tbody :hover {
     color: darkslategray;
 }
 
+.action-button {
+    margin: 2px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+/* ---------- Loader ---------- */
+
 .loader-container {
     width: 100%;
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    margin-top: 15vh;
     position: fixed;
     background: rgba(255, 255, 255, 0.8);
     z-index: 2;
 }
 
-@keyframes spin-anim {
-    0% {
-        transform: rotate(0deg);
+.loader {
+    display: block;
+    --height-of-loader: 4px;
+    --loader-color: #00acc1;
+    width: 130px;
+    height: var(--height-of-loader);
+    border-radius: 30px;
+    background-color: rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.loader::before {
+    content: "";
+    position: absolute;
+    background: var(--loader-color);
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    border-radius: 30px;
+    animation: moving 1s ease-in-out infinite;
+}
+
+@keyframes moving {
+    50% {
+        width: 100%;
     }
+
     100% {
-        transform: rotate(360deg);
+        width: 0;
+        right: 0;
+        left: unset;
     }
 }
 
-.action-button {
-    margin: 2px;
-}
 
 /* ---------- Table ---------- */
 
@@ -151,6 +183,7 @@ tbody :hover {
     display: flex;
     list-style-type: none;
 }
+
 .pagination-container .pagination-item {
     padding: 0 12px;
     height: 32px;
@@ -166,42 +199,51 @@ tbody :hover {
     font-size: 13px;
     min-width: 32px;
 }
+
 .pagination-container .pagination-item.dots:hover {
     background-color: transparent;
     cursor: default;
 }
+
 .pagination-container .pagination-item:hover {
     background-color: rgba(0, 0, 0, 0.04);
     cursor: pointer;
 }
+
 .pagination-container .pagination-item.selected {
     background-color: rgba(0, 0, 0, 0.08);
 }
+
 .pagination-container .pagination-item .arrow::before {
     position: relative;
-   /* top: 3pt;
+    /* top: 3pt;
     Uncomment this to lower the icons as requested in comments*/
     content: '';
-   /* By using an em scale, the arrows will size with the font */
+    /* By using an em scale, the arrows will size with the font */
     display: inline-block;
     width: 0.4em;
     height: 0.4em;
     border-right: 0.12em solid rgba(0, 0, 0, 0.87);
     border-top: 0.12em solid rgba(0, 0, 0, 0.87);
 }
+
 .pagination-container .pagination-item .arrow.left {
     transform: rotate(-135deg) translate(-50%);
 }
+
 .pagination-container .pagination-item .arrow.right {
     transform: rotate(45deg);
 }
+
 .pagination-container .pagination-item.disabled {
     pointer-events: none;
 }
+
 .pagination-container .pagination-item.disabled .arrow::before {
     border-right: 0.12em solid rgba(0, 0, 0, 0.43);
     border-top: 0.12em solid rgba(0, 0, 0, 0.43);
 }
+
 .pagination-container .pagination-item.disabled:hover {
     background-color: transparent;
     cursor: default;

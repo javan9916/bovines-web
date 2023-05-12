@@ -3,10 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { HiCheck } from 'react-icons/hi'
-import { HashLoader } from 'react-spinners'
 
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function CreateInitialWeights() {
@@ -20,7 +19,7 @@ export default function CreateInitialWeights() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const { id } = useParams()
 
@@ -51,11 +50,7 @@ export default function CreateInitialWeights() {
     })
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -71,6 +66,7 @@ export default function CreateInitialWeights() {
                                         name='purchase_weight'
                                         type='number'
                                         placeholder='Peso en compra'
+                                        aria-invalid={errors.purchase_weight ? 'true' : ''}
                                         {...register('purchase_weight', { required: true })} />
                                     <div className='centered-flex-container'>KG</div>
                                 </div>
@@ -83,6 +79,7 @@ export default function CreateInitialWeights() {
                                     name='purchase_weight_date'
                                     type='date'
                                     max={new Date().toISOString().split('T')[0]}
+                                    aria-invalid={errors.purchase_date ? 'true' : ''}
                                     {...register('purchase_date', { required: true, value: formattedDate })} />
                             </label>
                         </div>
@@ -96,6 +93,7 @@ export default function CreateInitialWeights() {
                                         name='arrival_weight'
                                         type='number'
                                         placeholder='Peso en finca'
+                                        aria-invalid={errors.arrival_weight ? 'true' : ''}
                                         {...register('arrival_weight', { required: true })} />
                                     <div className='centered-flex-container'>KG</div>
                                 </div>
@@ -107,6 +105,7 @@ export default function CreateInitialWeights() {
                                     id='arrival_weight_date'
                                     name='arrival_weight_date'
                                     type='date'
+                                    aria-invalid={errors.arrival_date ? 'true' : ''}
                                     {...register('arrival_date', { required: true, value: formattedDate })} />
                             </label>
                         </div>

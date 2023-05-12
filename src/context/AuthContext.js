@@ -1,10 +1,9 @@
 import { createContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { HashLoader } from 'react-spinners'
 import jwt_decode from 'jwt-decode'
 import { baseURL } from '../shared'
 import { toast } from 'react-hot-toast'
-import { spinnerColor } from '../shared'
+import Loading from '../components/Loading'
 
 
 const AuthContext = createContext()
@@ -99,9 +98,7 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={contextData}>
             {loading ?
-                <div className='loader-container'>
-                    <HashLoader color={spinnerColor} loading={loading} />
-                </div>
+                <Loading />
                 :
                 children
             }

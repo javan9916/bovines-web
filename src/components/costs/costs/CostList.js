@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { HashLoader } from 'react-spinners'
 
 import Pagination from '../../Pagination'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 const headers = { name: 'Nombre', type: 'Tipo', category: 'Categoría', date: 'Fecha', cost: 'Costo' }
@@ -56,11 +55,7 @@ export default function CostList() {
     }, [navigate, order, type, category, currentPage, offset])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>

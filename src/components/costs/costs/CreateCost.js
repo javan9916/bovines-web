@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { HiCheck } from 'react-icons/hi'
-import { HashLoader } from 'react-spinners'
 
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function CreateCost() {
@@ -20,7 +19,7 @@ export default function CreateCost() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const [categories, setCategories] = useState([])
 
@@ -52,11 +51,7 @@ export default function CreateCost() {
     }, [navigate])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main>
@@ -71,6 +66,7 @@ export default function CreateCost() {
                                     name='name'
                                     type='text'
                                     placeholder='Nombre del costo'
+                                    aria-invalid={errors.name ? 'true' : ''}
                                     {...register('name', { required: true })} />
                             </label>
     
@@ -80,6 +76,7 @@ export default function CreateCost() {
                                     id='date'
                                     name='date'
                                     type='date'
+                                    aria-invalid={errors.date ? 'true' : ''}
                                     {...register('date', { required: true, value: formattedDate })} />
                             </label>
     
@@ -90,6 +87,7 @@ export default function CreateCost() {
                                     name='cost'
                                     type='number'
                                     placeholder='Total del costo'
+                                    aria-invalid={errors.cost ? 'true' : ''}
                                     {...register('cost', { required: true })} />
                             </label>
                         </div>
@@ -100,6 +98,7 @@ export default function CreateCost() {
                                 <select
                                     id='category'
                                     name='category'
+                                    aria-invalid={errors.category ? 'true' : ''}
                                     {...register('category', { required: true })}>
                                     <option value='' disabled>Seleccionar</option>
                                     {categories.map((category, key) =>
@@ -113,6 +112,7 @@ export default function CreateCost() {
                                 <select
                                     id='type'
                                     name='type'
+                                    aria-invalid={errors.type ? 'true' : ''}
                                     {...register('type', { required: true })}>
                                     <option value='' disabled>Seleccionar</option>
                                     <option value='I'>Inversión</option>

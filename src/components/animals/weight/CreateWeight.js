@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-import { HashLoader } from 'react-spinners'
 
 import { HiCheck } from 'react-icons/hi'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function CreateWeight() {
@@ -20,7 +19,7 @@ export default function CreateWeight() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const { id } = useParams()
 
@@ -39,11 +38,7 @@ export default function CreateWeight() {
     })
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -59,6 +54,7 @@ export default function CreateWeight() {
                                         name='weight'
                                         type='number'
                                         placeholder='Peso'
+                                        aria-invalid={errors.weight ? 'true' : ''}
                                         {...register('weight', { required: true })} />
                                     <div className='centered-flex-container'>KG</div>
                                 </div>
@@ -71,6 +67,7 @@ export default function CreateWeight() {
                                     name='date'
                                     type='date'
                                     max={new Date().toISOString().split('T')[0]}
+                                    aria-invalid={errors.date ? 'true' : ''}
                                     {...register('date', { required: true, value: formattedDate })} />
                             </label>
                         </div>

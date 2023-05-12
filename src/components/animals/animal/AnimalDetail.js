@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { HiPlus } from 'react-icons/hi'
-import { HashLoader } from 'react-spinners'
 
 import DeleteModal from '../../DeleteModal'
 import UpdateAnimal from './UpdateAnimal'
 import humanizeDuration from 'humanize-duration'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 const headers = { weight: 'Peso', date: 'Fecha de registro', gpd: 'GPD', gpt: 'GPT', fca: 'FCA' }
@@ -65,7 +64,6 @@ export default function AnimalDetail() {
                 const groups = await api.get(`animals/api/groups/?animals=${id}`)
 
                 setAnimal(animal.data)
-                console.log(animal.data)
                 doDates(animal.data.weights)
 
                 if (groups.data.length)
@@ -79,11 +77,7 @@ export default function AnimalDetail() {
     }, [id])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         if (animal) {
             return (

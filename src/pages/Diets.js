@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { HashLoader } from 'react-spinners'
 import { toast } from 'react-hot-toast'
 import { HiPlus } from 'react-icons/hi'
 
 import useAxios from '../utils/useAxios'
-import { spinnerColor } from '../shared'
+import Loading from '../components/Loading'
 
 
 const dietHeaders = { name: 'Nombre', cost: 'Costo total' }
@@ -85,17 +84,13 @@ export default function Diets() {
     }, [endingPhase, gainingPhase, devPhase])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
                 <section>
                     <div className='centered-flex-container'>
-                        <h1 className='flex-3 fit'>
+                        <h1 className='flex-3 fit clickable' onClick={() => navigate('lista')}>
                             Dietas
                         </h1>
                         <button
@@ -107,7 +102,6 @@ export default function Diets() {
                         </button>
                     </div>
                     <div>
-
                         {diets && diets.length ?
                             <div>
                                 <table>
@@ -148,7 +142,7 @@ export default function Diets() {
                 </section>
                 <section>
                     <div className='centered-flex-container'>
-                        <h1 className='flex-3 fit'>
+                        <h1 className='flex-3 fit clickable' onClick={() => navigate('suplementos/lista')}>
                             Inventario
                         </h1>
                         <button

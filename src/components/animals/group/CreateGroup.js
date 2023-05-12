@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { HashLoader } from 'react-spinners'
 import { useForm } from 'react-hook-form'
 import { HiCheck } from 'react-icons/hi'
 
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 const headers = { action: '', badge_number: 'Identificador', origin: 'Procedencia', sex: 'Sexo', breed: 'Raza' }
@@ -17,7 +16,7 @@ export default function CreateGroup() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const [sectors, setSectors] = useState([])
     const [animals, setAnimals] = useState([])
@@ -60,11 +59,7 @@ export default function CreateGroup() {
     }, [navigate])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -79,6 +74,7 @@ export default function CreateGroup() {
                                     name='name'
                                     type='text'
                                     placeholder='Nombre del grupo'
+                                    aria-invalid={errors.name ? 'true' : ''}
                                     {...register('name', { required: true })} />
                             </label>
                             <label htmlFor='sector'>
@@ -86,6 +82,7 @@ export default function CreateGroup() {
                                 <select
                                     id='sector'
                                     name='sector'
+                                    aria-invalid={errors.sector ? 'true' : ''}
                                     {...register('sector', { required: true })}>
                                     <option value='' disabled>Seleccionar</option>
                                     {sectors.map((sector, key) =>

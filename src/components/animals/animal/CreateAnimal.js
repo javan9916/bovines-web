@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-import { HashLoader } from 'react-spinners'
 
 import { HiCheck } from 'react-icons/hi'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function CreateAnimal() {
@@ -15,7 +14,7 @@ export default function CreateAnimal() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const onSubmit = handleSubmit(async data => {
         setLoading(true)
@@ -30,11 +29,7 @@ export default function CreateAnimal() {
     })
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -49,6 +44,7 @@ export default function CreateAnimal() {
                                     name='badge_number'
                                     type='number'
                                     placeholder='Identificador del animal'
+                                    aria-invalid={errors.badge_number ? 'true' : ''}
                                     {...register('badge_number', { required: true })} />
                             </label>
 
@@ -59,6 +55,7 @@ export default function CreateAnimal() {
                                     name='cost_per_kg'
                                     type='number'
                                     placeholder='Precio del animal'
+                                    aria-invalid={errors.cost_per_kg ? 'true' : ''}
                                     {...register('cost_per_kg', { required: true })} />
                             </label>
                         </div>
@@ -71,6 +68,7 @@ export default function CreateAnimal() {
                                     name='breed'
                                     type='text'
                                     placeholder='Raza del animal'
+                                    aria-invalid={errors.breed ? 'true' : ''}
                                     {...register('breed', { required: true })} />
                             </label>
 
@@ -79,6 +77,7 @@ export default function CreateAnimal() {
                                 <select
                                     id='origin'
                                     name='origin'
+                                    aria-invalid={errors.origin ? 'true' : ''}
                                     {...register('origin', { required: true })} >
                                     <option value='' disabled>Seleccionar</option>
                                     <option value='F'>Finca</option>
@@ -91,6 +90,7 @@ export default function CreateAnimal() {
                                 <select
                                     id='sex'
                                     name='sex'
+                                    aria-invalid={errors.sex ? 'true' : ''}
                                     {...register('sex', { required: true })} >
                                     <option value='' disabled>Seleccionar</option>
                                     <option value='M'>Macho</option>

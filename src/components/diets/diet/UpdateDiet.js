@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { HashLoader } from 'react-spinners'
 
 import { HiPencil } from 'react-icons/hi'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 const headers = { action: '', quantity: 'Cantidad', name: 'Nombre', kg_presentation: 'Presentación' }
@@ -62,11 +61,7 @@ export default function UpdateDiet(props) {
     }, [navigate, dietSupplements])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <>

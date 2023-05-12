@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { HashLoader } from 'react-spinners'
 import { HiPlus } from 'react-icons/hi'
 import { toast } from 'react-hot-toast'
 
 import useAxios from '../utils/useAxios'
-import { spinnerColor } from '../shared'
+import Loading from '../components/Loading'
 
 
 const costHeaders = { name: 'Nombre', type: 'Tipo', cost: 'Costo' }
@@ -52,17 +51,13 @@ export default function Costs() {
     }, [])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
                 <section>
                     <div className='centered-flex-container'>
-                        <h1 className='flex-3 fit'>
+                        <h1 className='flex-3 fit clickable' onClick={() => navigate('lista')}>
                             Costos
                         </h1>
                         <button
@@ -100,7 +95,7 @@ export default function Costs() {
                                 </table>
                                 {costLength > 5 ?
                                     <div className='centered-flex-container'>
-                                        <button onClick={() => navigate('lista')} className='fit '>
+                                        <button onClick={() => navigate('lista')} className='fit'>
                                             Ver toda la lista
                                         </button>
                                     </div>
@@ -115,7 +110,7 @@ export default function Costs() {
                 </section>
                 <section>
                     <div className='centered-flex-container'>
-                        <h1 className='flex-3 fit'>
+                        <h1 className='flex-3 fit clickable' onClick={() => navigate('categorias/lista')}>
                             Categorías
                         </h1>
                         <button

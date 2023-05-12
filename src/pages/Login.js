@@ -1,8 +1,7 @@
 import { useContext, useState } from 'react'
-import { HashLoader } from 'react-spinners'
 
 import AuthContext from '../context/AuthContext'
-import { spinnerColor } from '../shared'
+import Loading from '../components/Loading'
 
 
 export default function Login() {
@@ -19,11 +18,7 @@ export default function Login() {
     }
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>

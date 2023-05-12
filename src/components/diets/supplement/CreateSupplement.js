@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-import { HashLoader } from 'react-spinners'
 import { HiCheck } from 'react-icons/hi'
 
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 export default function CreateSupplement() {
@@ -15,7 +14,7 @@ export default function CreateSupplement() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const onSubmit = handleSubmit(async data => {
         setLoading(true)
@@ -30,11 +29,7 @@ export default function CreateSupplement() {
     })
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -48,6 +43,7 @@ export default function CreateSupplement() {
                                 name='name'
                                 type='text'
                                 placeholder='Nombre del suplemento'
+                                aria-invalid={errors.name ? 'true' : ''}
                                 {...register('name', { required: true })} />
                         </label>
 
@@ -60,6 +56,7 @@ export default function CreateSupplement() {
                                         name='kg'
                                         type='number'
                                         placeholder='Presentación del suplemento'
+                                        aria-invalid={errors.kg_presentation ? 'true' : ''}
                                         {...register('kg_presentation', { required: true })} />
                                     <div className='centered-flex-container'>KG</div>
                                 </div>
@@ -72,6 +69,7 @@ export default function CreateSupplement() {
                                     name='price'
                                     type='number'
                                     placeholder='Precio del suplemento'
+                                    aria-invalid={errors.price ? 'true' : ''}
                                     {...register('price', { required: true })} />
                             </label>
                         </div>
@@ -82,6 +80,7 @@ export default function CreateSupplement() {
                                 id='description'
                                 name='description'
                                 placeholder='Descripción del suplemento'
+                                aria-invalid={errors.description ? 'true' : ''}
                                 {...register('description', { required: true })} />
                         </label>
 

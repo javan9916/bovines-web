@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-import { HashLoader } from 'react-spinners'
 
 import { HiCheck } from 'react-icons/hi'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 const headers = { action: '', quantity: 'Cantidad', name: 'Suplemento' }
@@ -17,7 +16,7 @@ export default function CreateDiet() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState()
 
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const [supplements, setSupplements] = useState([])
 
@@ -63,11 +62,7 @@ export default function CreateDiet() {
     }, [navigate])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         return (
             <main className='container'>
@@ -81,6 +76,7 @@ export default function CreateDiet() {
                                 name='name'
                                 type='text'
                                 placeholder='Nombre de la dieta'
+                                aria-invalid={errors.name ? 'true' : ''}
                                 {...register('name', { required: true })} />
                         </label>
 

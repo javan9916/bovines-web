@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
-import { HashLoader } from 'react-spinners'
 import { HiPlus } from 'react-icons/hi'
 
 import DeleteModal from '../../DeleteModal'
 import UpdateSupplement from './UpdateSupplement'
 import useAxios from '../../../utils/useAxios'
-import { spinnerColor } from '../../../shared'
+import Loading from '../../Loading'
 
 
 const headers = { price: 'Precio', date: 'Fecha de registro' }
@@ -61,11 +60,7 @@ export default function SupplementDetail() {
     }, [navigate, id])
 
     if (loading) {
-        return (
-            <div className='loader-container'>
-                <HashLoader color={spinnerColor} loading={loading} />
-            </div>
-        )
+        return <Loading />
     } else {
         if (supplement) {
             return (
